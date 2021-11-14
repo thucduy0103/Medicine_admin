@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/Medicine_api/static/css/main.5bc842d9.chunk.css",
+    "main.js": "/Medicine_api/static/js/main.83adb023.chunk.js",
+    "main.js.map": "/Medicine_api/static/js/main.83adb023.chunk.js.map",
+    "runtime-main.js": "/Medicine_api/static/js/runtime-main.313cb8b9.js",
+    "runtime-main.js.map": "/Medicine_api/static/js/runtime-main.313cb8b9.js.map",
+    "static/css/2.c33d3e7c.chunk.css": "/Medicine_api/static/css/2.c33d3e7c.chunk.css",
+    "static/js/2.4637da2f.chunk.js": "/Medicine_api/static/js/2.4637da2f.chunk.js",
+    "static/js/2.4637da2f.chunk.js.map": "/Medicine_api/static/js/2.4637da2f.chunk.js.map",
+    "index.html": "/Medicine_api/index.html",
+    "precache-manifest.d53ccd6eb30006dc9c162074d00b3f7c.js": "/Medicine_api/precache-manifest.d53ccd6eb30006dc9c162074d00b3f7c.js",
+    "service-worker.js": "/Medicine_api/service-worker.js",
+    "static/css/2.c33d3e7c.chunk.css.map": "/Medicine_api/static/css/2.c33d3e7c.chunk.css.map",
+    "static/css/main.5bc842d9.chunk.css.map": "/Medicine_api/static/css/main.5bc842d9.chunk.css.map"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.313cb8b9.js",
+    "static/css/2.c33d3e7c.chunk.css",
+    "static/js/2.4637da2f.chunk.js",
+    "static/css/main.5bc842d9.chunk.css",
+    "static/js/main.83adb023.chunk.js"
+  ]
+}
