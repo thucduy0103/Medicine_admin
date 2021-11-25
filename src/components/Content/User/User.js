@@ -29,16 +29,17 @@ class User extends Component {
     token = localStorage.getItem('_auth');
     this.props.fetch_users(token).then(res => {
       this.setState({
-        total: res.total
+        total: res.totalResults
       });
     }).catch(err => {
-      console.log(err);  
+      console.log(err);
     })
   }
   pageChange(content){
     const limit = 10;
-    const offset = limit * (content - 1);
-    this.props.fetch_users(token, offset);
+    // const offset = limit * (content - 1);
+    const nextPage = content
+    this.props.fetch_users(token, nextPage);
     this.setState({
       currentPage: content
     })
@@ -139,11 +140,8 @@ class User extends Component {
                             <th>Number</th>
                             <th>Email</th>
                             <th>Name</th>
-                            <th style={{textAlign: "center"}}>Supper Admin</th>
                             <th style={{textAlign: "center"}}>Admin</th>
-                            <th style={{textAlign: "center"}}>Staff</th>
                             <th style={{textAlign: "center"}}>User</th>
-                            <th style={{textAlign: "center"}}>Active</th>
                             <th style={{textAlign: "center"}}>Action</th>
                           </tr>
                         </thead>
@@ -157,51 +155,22 @@ class User extends Component {
                                 <td style={{textAlign: "center"}}>
                                   <div class="i-checks">
                                     {
-                                      item.role.nameRole === 'superadmin' ? 
+                                      item.role === 'admin' ?
                                       <input type="radio" checked={true} onChange={() => this.handleChangeRadio} class="radio-template" />
                                       :
                                       <input type="radio" checked={false} onChange={() => this.handleChangeRadio} class="radio-template" />
-                                    }                                 
+                                    }
                                   </div>
                                 </td>
                                 <td style={{textAlign: "center"}}>
                                   <div class="i-checks">
                                     {
-                                      item.role.nameRole === 'admin' ? 
+                                      item.role === 'user' ?
                                       <input type="radio" checked={true} onChange={() => this.handleChangeRadio} class="radio-template" />
                                       :
                                       <input type="radio" checked={false} onChange={() => this.handleChangeRadio} class="radio-template" />
-                                    }                                 
+                                    }
                                   </div>
-                                </td>
-                                <td style={{textAlign: "center"}}>
-                                  <div class="i-checks">
-                                    {
-                                      item.role.nameRole === 'staff' ? 
-                                      <input type="radio" checked={true} onChange={() => this.handleChangeRadio} class="radio-template" />
-                                      :
-                                      <input type="radio" checked={false} onChange={() => this.handleChangeRadio} class="radio-template" />
-                                    }                                 
-                                  </div>
-                                </td>
-                                <td style={{textAlign: "center"}}>
-                                  <div class="i-checks">
-                                    {
-                                      item.role.nameRole === 'user' ? 
-                                      <input type="radio" checked={true} onChange={() => this.handleChangeRadio} class="radio-template" />
-                                      :
-                                      <input type="radio" checked={false} onChange={() => this.handleChangeRadio} class="radio-template" />
-                                    }                                 
-                                  </div>
-                                </td>
-                                <td style={{textAlign: "center"}}>{item.isActive ?
-                                  <div className="i-checks">
-                                    <input type="checkbox" checked={true} onChange={() => this.handleChangeCheckBox} className="checkbox-template" />
-                                  </div>
-                                  :
-                                  <div className="i-checks">
-                                    <input type="checkbox" checked={false} onChange={() => this.handleChangeCheckBox} className="checkbox-template" />
-                                  </div>}
                                 </td>
                                 <td style={{textAlign: "center"}}>
                                   <div>

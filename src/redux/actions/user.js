@@ -10,7 +10,7 @@ export const actFetchUsersRequest = (token, offset) => {
   return dispatch => {
     dispatch(actShowLoading());
     return new Promise((resolve, reject) => {
-      callApi(`users?limit=${limit}&offset=${newOffset}&orderBy=-createdAt`, 'GET', null, token)
+      callApi(`users?limit=${limit}&page=${newOffset}&sortBy=-createdAt`, 'GET', null, token)
         .then(res => {
           if (res && res.status === 200) {
             dispatch(actFetchUsers(res.data.results));

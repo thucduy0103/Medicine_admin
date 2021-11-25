@@ -10,6 +10,9 @@ import { uploadImage } from '../../../utils/upload'
 import Dropzone from 'react-dropzone';
 import { css } from '@emotion/core';
 import ClipLoader from 'react-spinners/ClipLoader';
+import moment from 'moment'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css';
 let token;
 let id;
 const override = css`
@@ -46,20 +49,23 @@ class ActionProduct extends Component {
     this.state = {
       nameProduct: '',
       price: 0,
+      discountPrice: 0,
       numberAvailable: 0,
-      categoryId: null,
+      unit: '',
+      category: [],
       desc: '',
-      isActive: true,
       image: '',
       properties: {},
-      producerId: null,
+      productionDate: moment().format("DD/MM/YYYY"),
+      expiryDate: moment().add(1, 'Y').format("DD/MM/YYYY"),
       redirectToProduct: false,
       dataCategories: [],
       dataProducer: [],
       img: null,
       loading: false,
       files: [],
-      dataGallery: []
+      dataGallery: [],
+      selectCategories: []
     };
     id = this.props.id
   }
@@ -73,19 +79,21 @@ class ActionProduct extends Component {
     if (id) {
       const res = await callApi(`products/get-product-by-id?ProductId=${id}`, 'GET', null, token);
       if (res && res.status === 200){
-        const resProducer =  await callApi(`category/${res.data.categoryId}/producers`, 'GET', null);
+        // const resProducer =  await callApi(`category/${res.data.chooseCategories}/producers`, 'GET', null);
         const convertProperties = JSON.stringify(res.data.properties)
         this.setState({
-          dataProducer: resProducer,
+          // dataProducer: resProducer,
           nameProduct: res.data.name,
           price: res.data.price,
+          discountPrice: res.data.discountPrice,
+          unit: res.data.unit,
           numberAvailable: res.data.inventoryQty,
-          categoryId: res.data.categoryId,
+          category: res.data.category,
           desc: res.data.description,
-          isActive: res.data.isActive,
           image: res.data.image,
           properties: convertProperties,
-          producerId: res.data.id,
+          productionDate: res.data.productionDate,
+          expiryDate: res.data.expiryDate,
           dataGallery: res.data.imageDetail
         })
       }
@@ -113,30 +121,34 @@ class ActionProduct extends Component {
       [name]: value
     });
   }
+  handleChangeProductionDate = (event) => {
+    const value = moment(event).format("DD/MM/YYYY");
+    this.setState({
+      productionDate: value
+    });
+  }
+  handleChangeExpiryDate = (event) => {
+    const value = moment(event).format("DD/MM/YYYY");
+    this.setState({
+      expiryDate: value
+    });
+  }
 
   handleChangeCategory = async (event) => {
     const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const res = await callApi(`category/${value}/producers`, 'GET', null);
-    if(res && res.data.length) {
-      this.setState({
-        producerId: res.data[0].id,
-        categoryId: value,
-        dataProducer: res.data
-      })
-    } else {
-      this.setState({
-        categoryId: value
-      })
+    // const value = target.type === 'checkbox' ? target.checked : target.value;
+    var newStateArray = this.state.category.slice();
+    if (target.checked) {
+      newStateArray.push(target.value);
+    }else {
+      newStateArray = newStateArray.filter(function(ele){
+          return ele != target.value;
+      });
     }
-  }
-
-  handleChangeSelecProducer = (event) => {
-    let value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
     this.setState({
-      producerId: value
+      category: newStateArray
     })
-  } // get value of state
+  }
 
   handleChangeRemoveGallery = (index) => {
     const data = [...this.state.dataGallery];
@@ -147,7 +159,7 @@ class ActionProduct extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const {files, dataGallery, nameProduct, price, numberAvailable, categoryId, isActive, desc, properties, producerId } = this.state;
+    const {files, dataGallery, nameProduct, price, discountPrice, numberAvailable, unit, category, desc, properties, productionDate, expiryDate } = this.state;
     let { image, img } = this.state;
     let newFiles = dataGallery;
     this.setState({
@@ -166,10 +178,11 @@ class ActionProduct extends Component {
     const newName = nameProduct === '' ? null : nameProduct;
     const newImage = image === '' ? null : image;
     const newGallery = newFiles && newFiles.length === 0 ? null : newFiles;
-    const newProducerId = parseInt(producerId);
     const newProperties = properties === {} ? null : properties;
     const newNumberAvailable = parseInt(numberAvailable);
-    const newCategoryId = parseInt(categoryId);
+    const newProductionDate = productionDate
+    const newExpiryDate =  expiryDate
+    const newCategory = category;
     let newGalleryFinal = [];
     if(newGallery && newGallery.length) {
       newGallery.forEach((item) => {
@@ -180,16 +193,19 @@ class ActionProduct extends Component {
     }
     if (!id) {
       const newProduct = {
-        isActive,
-        nameProduct: newName,
-        price,
-        numberAvailable: newNumberAvailable,
-        categoryId: newCategoryId,
+        name: newName,
+        slug : "slug",
+        content: newName,
+        price :price,
+        discountPrice : discountPrice,
+        inventoryQty: newNumberAvailable,
+        unit : unit,
+        category: newCategory,
         image: newImage,
-        gallery: newGalleryFinal,
+        imageDetail: newGalleryFinal,
         description: newDesc,
-        properties: newProperties,
-        producerId: newProducerId
+        productionDate: newProductionDate,
+        expiryDate : newExpiryDate
       }
       this.props.add_Product(token, newProduct);
       this.setState({
@@ -198,20 +214,24 @@ class ActionProduct extends Component {
         desc: '',
         properties: {},
         dataGallery: newGalleryFinal,
-        loading: false
+        loading: false,
+        redirectToProduct: true,
       })
     } else {
       const editProduct = {
-        isActive,
-        nameProduct: newName,
-        price,
-        numberAvailable,
-        categoryId,
+        name: newName,
+        slug:"slug",
+        content: newName,
+        price :price,
+        discountPrice : discountPrice,
+        unit :"Hộp",
+        inventoryQty :numberAvailable,
+        category : category,
         image: newImage,
-        gallery: newGalleryFinal,
+        imageDetail: newGalleryFinal,
         description: newDesc,
-        properties: newProperties,
-        producerId: newProducerId
+        productionDate: newProductionDate,
+        expiryDate : newExpiryDate
       }
       await this.props.edit_Product(token, id, editProduct);
       this.setState({
@@ -239,7 +259,7 @@ class ActionProduct extends Component {
   ];
 
   render() {
-    const { dataGallery, nameProduct, loading, price, numberAvailable, categoryId, isActive, image, desc, producerId, redirectToProduct, dataCategories, dataProducer } = this.state;
+    const { dataGallery, nameProduct, loading, price, discountPrice, numberAvailable, unit, category, image, desc, producerId, redirectToProduct, dataCategories, productionDate, expiryDate } = this.state;
     let files;
     if(dataGallery && dataGallery.length !== 0) {
       files = dataGallery.map((file, index) => {
@@ -310,6 +330,16 @@ class ActionProduct extends Component {
                         <div className="col-sm-3">
                           <input name="price" onChange={this.handleChange} value={price} type="number" className="form-control" />
                         </div>
+                        <label className="col-sm-3 form-control-label" style={{textAlign: 'center'}}>Discount Price</label>
+                        <div className="col-sm-3">
+                          <input name="discountPrice" onChange={this.handleChange} value={discountPrice} type="number" className="form-control" />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <label className="col-sm-3 form-control-label">Unit</label>
+                        <div className="col-sm-3">
+                          <input name="unit" onChange={this.handleChange} value={unit} type="text" className="form-control" />
+                        </div>
                         <label className="col-sm-3 form-control-label" style={{textAlign: 'center'}}>Available</label>
                         <div className="col-sm-3">
                           <input name="numberAvailable" onChange={this.handleChange} value={numberAvailable} type="number" className="form-control" />
@@ -338,14 +368,15 @@ class ActionProduct extends Component {
                       </div>
                       <div className="line" />
                       <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Active <br /></label>
-                        <div className="col-sm-9">
-                          <div className="i-checks">
-                            <input type="checkbox"
-                              onChange={this.handleChange}
-                              name="isActive"
-                              checked={isActive} className="checkbox-template" />
-                          </div>
+                        <label className="col-sm-3 form-control-label">Production Date</label>
+                        <div className="col-sm-3">
+                          <DatePicker name="productionDate" value={productionDate} onChange={this.handleChangeProductionDate}/>
+                          {/* <input name="productionDate" onChange={this.handleChange} value={productionDate} type="date" className="form-control"/>*/}
+                        </div>
+                        <label className="col-sm-3 form-control-label" style={{textAlign: 'center'}}>Expiry Date</label>
+                        <div className="col-sm-3">
+                          <DatePicker name="expiryDate" value={expiryDate} onChange={this.handleChangeExpiryDate}/>
+                          {/* <input name="expiryDate" onChange={this.handleChange} value={expiryDate} type="date" className="form-control" />*/}
                         </div>
                       </div>
                       <div className="line" />
@@ -358,10 +389,10 @@ class ActionProduct extends Component {
                               return (
                                 <div key={index} className="i-checks" style={{ display: 'inline-block', paddingRight: 35 }} >
                                   {
-                                    item.id === categoryId ?
-                                      <input id={index} name="categoryId" checked onChange={this.handleChangeCategory} type="checkbox" value={item.id} className="checkbox-template" />
+                                     category.includes(item.slug) ?
+                                      <input id={index} name="category" checked onChange={this.handleChangeCategory} type="checkbox" value={item.slug} className="checkbox-template" />
                                       :
-                                      <input id={index} name="categoryId" onChange={this.handleChangeCategory} type="checkbox" value={item.id} className="checkbox-template" />
+                                      <input id={index} name="category" onChange={this.handleChangeCategory} type="checkbox" value={item.slug} className="checkbox-template" />
                                   }
                                   <label>{item.name}</label>
                                 </div>
@@ -369,21 +400,6 @@ class ActionProduct extends Component {
                             })
                             : null
                           }
-                        </div>
-                      </div>
-                      <div className="line" />
-                      <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Producer</label>
-                        <div className="col-sm-9">
-                          <select className="form-control mb-3" name="producerId" value={producerId} onChange={this.handleChangeSelecProducer} >
-                            {
-                             categoryId !==0 && dataProducer && dataProducer.length ? dataProducer.map((item, index) => {
-                                return (
-                                  <option key={index} value={item.id} >{item.name}</option>
-                                )
-                              }) : null
-                            }
-                          </select>
                         </div>
                       </div>
                       <div className="line" />

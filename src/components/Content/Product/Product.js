@@ -151,7 +151,6 @@ class Product extends Component {
                             <th style={{ textAlign: "center" }}>Available</th>
                             {/* <th>Properties</th> */}
                             <th style={{ textAlign: "center" }}>Images</th>
-                            <th style={{ textAlign: "center" }}>Active</th>
                             <th style={{ textAlign: "center" }}>Action</th>
                           </tr>
                         </thead>
@@ -169,15 +168,6 @@ class Product extends Component {
                                   <div className="fix-cart">
                                     <img src={item && item.image ? item.image : null} className="fix-img" alt="not found" />
                                   </div>
-                                </td>
-                                <td style={{ textAlign: "center" }}>{item.isActive ?
-                                  <div className="i-checks">
-                                    <input type="checkbox" checked={true} className="checkbox-template" />
-                                  </div>
-                                  :
-                                  <div className="i-checks">
-                                    <input type="checkbox" checked={false} className="checkbox-template" />
-                                  </div>}
                                 </td>
                                 <td style={{ textAlign: "center" }}>
                                   <div>

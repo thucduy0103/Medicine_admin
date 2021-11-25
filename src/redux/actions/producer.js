@@ -39,7 +39,7 @@ export const actFindProducersRequest = (token, searchText) => {
   dispatch(actShowLoading());
   return new Promise((resolve, reject) => {
     if (searchText !== undefined && searchText !== null && searchText !== '') {
-      callApi(`producers?q=${searchText}`, 'GET', null, token)
+      callApi(`producers/search-product?search=${searchText}`, 'GET', null, token)
       .then(res => {
         if (res && res.status === 200) {
           dispatch(actFindProducers(res.data.results));

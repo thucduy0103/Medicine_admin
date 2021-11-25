@@ -7,6 +7,8 @@ import { Redirect } from 'react-router-dom';
 import { uploadImage } from '../../../utils/upload'
 import { css } from '@emotion/core';
 import ClipLoader from 'react-spinners/ClipLoader';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 let token;
@@ -28,23 +30,21 @@ class ActionUser extends Component {
       address: '',
       email: '',
       password: '',
-      avatar: null,
       phone: '',
-      isActive: true,
-      isVerifyEmail: false,
-      roleId: 4,
+      roleId: 1,
       redirectToUser: false,
       dataRole: [],
-      img: null,
       loading: false
     };
     id = this.props.id
   }
   async componentDidMount() {
     token = localStorage.getItem('_auth');
-    const resRole = await callApi('roles', 'GET', null, token);
+    const resRole = await callApi('users/roles', 'GET', null, token);
     this.setState({
-      dataRole: resRole.data.results
+      dataRole: resRole.data
+    },()=>{
+      console.log(this.state.dataRole);
     })
     if (id) {
       const res = await callApi(`users/${id}`, 'GET', null, token);
@@ -52,23 +52,11 @@ class ActionUser extends Component {
         name: res.data.name,
         address: res.data.address,
         email: res.data.email,
-        avatar: res.data.avatar,
         phone: res.data.phone,
-        isActive: res.data.isActive,
-        isVerifyEmail: res.data.isVerifyEmail,
         roleId: res.data.roleId,
         desc: res.data.description,
       })
     }
-  }
-
-  handleChangeImage = (event) => {
-    if (event.target.files[0]) {
-      const img = event.target.files[0];
-      this.setState(() => ({ img }));
-    }
-    const output = document.getElementById('output');
-    output.src = URL.createObjectURL(event.target.files[0]);
   }
 
   handleChange = (event) => {
@@ -80,33 +68,55 @@ class ActionUser extends Component {
     });
   }
 
+  handleChangePassword = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    this.setState({
+      password: value
+    });
+  }
+
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { name, address, email, password, phone, isActive, isVerifyEmail, roleId } = this.state;
-    let { img, avatar } = this.state;
+    const { name, address, email, password, phone, roleId } = this.state;
     this.setState({
       loading: true
     })
-    //upload image to firebase
-    if (img !== null && img !== avatar) {
-      avatar = await uploadImage(img);
-    }
     const newRoleId = parseInt(roleId);
-    const newAvatar = (avatar === '') ? null : avatar
     const newAddress = (address === '') ? null : address
     const newPhone = (phone === '') ? null : phone
     const newName = (name === '') ? null : name
+
     if (!id) {
+
+      if (password.length < 6) {
+        toast.error('Mật khẩu phải lớn hơn 6 kí tự')
+        this.setState({
+          loading: false,
+        })
+        return
+      }
+      if (!password.match(/\d/) || !password.match(/[a-zA-Z]/)) {
+        toast.error('Mật khẩu phải có ít nhất 1 chữ số hoặc 1 kí tự')
+        this.setState({
+          loading: false,
+        })
+        return
+      }
+
+      var roleName = "user"
+      if (roleId == 0) {
+        roleName = "admin"
+      }
       const newUser = {
         name: newName,
         address: newAddress,
         email,
         password,
-        avatar: newAvatar,
         phone: newPhone,
-        isActive,
-        isVerifyEmail,
-        roleId: newRoleId
+        roleId: newRoleId,
+        roleName: roleName
       }
       await this.props.add_user(token, newUser);
       this.setState({
@@ -114,23 +124,22 @@ class ActionUser extends Component {
         address: '',
         email: '',
         password: 'password',
-        avatar: '',
         phone: '',
-        isActive: true,
-        isVerifyEmail: false,
-        roleId: 4,
+        roleId: 0,
         loading: false,
         redirectToUser: true
       })
     } else {
+      var roleName = "user"
+      if (roleId == 0) {
+        roleName = "admin"
+      }
       const editUser = {
         name: newName,
         address: newAddress,
-        avatar: newAvatar,
         phone: newPhone,
-        isActive,
-        isVerifyEmail,
-        roleId: newRoleId
+        roleId: newRoleId,
+        roleName: roleName
       }
       await this.props.edit_user(token, id, editUser);
       this.setState({
@@ -141,7 +150,7 @@ class ActionUser extends Component {
   }
 
   render() {
-    const { name, dataRole, address, email, password, avatar, phone, isActive, isVerifyEmail, roleId, redirectToUser, loading } = this.state;
+    const { name, dataRole, address, email, password, phone, roleId, redirectToUser, loading } = this.state;
     if (redirectToUser) {
       return <Redirect to="/users"></Redirect>
     }
@@ -211,44 +220,12 @@ class ActionUser extends Component {
                           <div className="form-group row">
                             <label className="col-sm-3 form-control-label">Password</label>
                             <div className="col-sm-9">
-                              <input type="password" value={password} onChange={this.handleChange} name="password" className="form-control" />
+                              <label>Mật khẩu phải lớn hơn 6 kí tự và có ít nhất 1 chữ số hoặc 1 kí tự</label>
+                              <input type="password" value={password} onChange={this.handleChangePassword} name="password" className="form-control" />
                             </div>
                           </div>
                         </div>
                       }
-                      <div className="line" />
-                      <div className="form-group row">
-                        <label htmlFor="fileInput" className="col-sm-3 form-control-label">Avatar</label>
-                        <div className="col-sm-9">
-                          <input type="file" onChange={this.handleChangeImage} className="form-control-file" />
-                          <div className="fix-cart">
-                          <img src={avatar || 'http://via.placeholder.com/400x300'} id="output" className="fix-img" alt="avatar" />
-                          </div>                     
-                        </div>
-                      </div>
-                      <div className="line" />
-                      <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Active</label>
-                        <div className="col-sm-3">
-                          <div className="i-checks">
-                            <input type="checkbox"
-                              name="isActive"
-                              checked={isActive}
-                              onChange={this.handleChange}
-                              className="checkbox-template" />
-                          </div>
-                        </div>
-                        <label className="col-sm-3 form-control-label" style={{textAlign: 'center'}}>Verify Email <br /></label>
-                        <div className="col-sm-3">
-                          <div className="i-checks">
-                            <input type="checkbox"
-                              name="isVerifyEmail"
-                              checked={isVerifyEmail}
-                              onChange={this.handleChange}
-                              className="checkbox-template" />
-                          </div>
-                        </div>
-                      </div>
                       <div className="line" />
                       <div className="form-group row">
                         <label className="col-sm-3 form-control-label">System user</label>
