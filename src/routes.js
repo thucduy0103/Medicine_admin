@@ -137,7 +137,7 @@ const routes = [
     main: ({ history }) => <ActionOrderPage history={history} />
   },
   {
-    path: '/orders/edit/:id',
+    path: '/orders/view/:id',
     exact: false,
     main: ({ match, history }) => <ActionOrderPage match={match} history={history} />
   },

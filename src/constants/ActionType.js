@@ -36,6 +36,7 @@ export const FIND_ORDERS = 'FIND_ORDERS';
 export const EDIT_ORDER = 'EDIT_ORDER';
 export const ADD_ORDER = 'ADD_ORDER';
 export const REMOVE_ORDER = 'REMOVE_ORDER';
+export const CONFIRM_ORDER = 'CONFIRM_ORDER';
 
 export const FETCH_PRODUCERS = 'FETCH_PRODUCERS';
 export const FIND_PRODUCERS = 'FIND_PRODUCERS';

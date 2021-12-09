@@ -4,7 +4,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { actAddProductRequest, actGetProductRequest, actEditProductRequest } from '../../../redux/actions/product';
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import callApi from '../../../utils/apiCaller';
 import { uploadImage } from '../../../utils/upload'
 import Dropzone from 'react-dropzone';
@@ -424,7 +424,7 @@ class ActionProduct extends Component {
                       <div className="line" />
                       <div className="form-group row">
                         <div className="col-sm-4 offset-sm-3">
-                          <button type="reset" className="btn btn-secondary" style={{ marginRight: 2 }}>Cancel</button>
+                          <Link to="/products" className="btn btn-secondary" style={{ marginRight: 2 }}>Cancel</Link>
                           <button type="submit" className="btn btn-primary">Save changes</button>
                         </div>
                       </div>

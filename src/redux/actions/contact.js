@@ -10,9 +10,9 @@ export const actFetchContactsRequest = (token, offset) => {
   return dispatch => {
     dispatch(actShowLoading());
     return new Promise((resolve, reject) => {
-      callApi(`contacts?limit=${limit}&offset=${newOffset}&orderBy=-createdAt`, 'GET', null, token)
+      callApi(`users/message?limit=${limit}&offset=${newOffset}&orderBy=-createdAt`, 'GET', null, token)
         .then(res => {
-          if(res && res.status === 200) { 
+          if(res && res.status === 200) {
             dispatch(actFetchContacts(res.data.results));
             resolve(res.data);
             setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
@@ -41,7 +41,7 @@ export const actFindContactsRequest = (token, searchText) => {
     if (searchText !== undefined && searchText !== null && searchText !== '') {
       callApi(`contacts?q=${searchText}`, 'GET', null, token)
       .then(res => {
-        if(res && res.status === 200) {  
+        if(res && res.status === 200) {
           dispatch(actFindContacts(res.data.results));
           resolve(res.data);
           setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
@@ -55,7 +55,7 @@ export const actFindContactsRequest = (token, searchText) => {
     } else {
       callApi('contacts', 'GET', null, token)
       .then(res => {
-        if(res && res.status === 200) {  
+        if(res && res.status === 200) {
           dispatch(actFindContacts(res.data.results));
           resolve(res.data);
           setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);

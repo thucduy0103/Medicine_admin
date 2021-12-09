@@ -10,7 +10,7 @@ export const actFetchOrdersRequest = (token, offset) => {
   return dispatch => {
     dispatch(actShowLoading());
     return new Promise((resolve, reject) => {
-      callApi(`orders?limit=${limit}&offset=${newOffset}&orderBy=-createdAt`, "GET", null, token)
+      callApi(`admin/orders?limit=${limit}&page=${newOffset}&sortBy=-createdAt`, "GET", null, token)
         .then(res => {
           if (res && res.status === 200) {
             dispatch(actFetchOrders(res.data.results));
@@ -39,7 +39,7 @@ export const actFindOrdersRequest = (token, searchText) => {
   dispatch(actShowLoading());
   return new Promise((resolve, reject) => {
     if (searchText !== undefined && searchText !== null && searchText !== '') {
-      callApi(`orders?q=${searchText}`, "GET", null, token)
+      callApi(`admin/orders?q=${searchText}`, "GET", null, token)
       .then(res => {
         if (res && res.status === 200) {
           dispatch(actFindOrders(res.data.results));
@@ -53,7 +53,7 @@ export const actFindOrdersRequest = (token, searchText) => {
         setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
       });
     } else {
-      callApi("orders", "GET", null, token)
+      callApi("admin/orders", "GET", null, token)
       .then(res => {
         if (res && res.status === 200) {
           dispatch(actFindOrders(res.data.results));
@@ -80,7 +80,7 @@ export const actFindOrders = orders => {
 
 export const actDeleteOrderRequest = (id, token) => {
   return async dispatch => {
-    await callApi(`orders/${id}`, "DELETE", null, token);
+    await callApi(`orders/delete-order?orderId=${id}`, "DELETE", null, token);
     dispatch(actDeleteOrder(id));
   };
 };
@@ -89,6 +89,28 @@ export const actDeleteOrder = id => {
   return {
     type: Types.REMOVE_ORDER,
     id
+  };
+};
+
+export const actConfirmOrderRequest = (id, data, token) => {
+  return async dispatch => {
+    const res = await callApi(`orders/confirm/${id}`, "PUT", data, token);
+    if (res && res.status === 200) {
+      toast.success("Confirm order is success");
+      dispatch(actEditOrder(res.data));
+    }
+    // dispatch(actConfirmOrder(data));
+  };
+};
+
+export const actSuccessOrderRequest = (id, token) => {
+  return async dispatch => {
+    const res = await callApi(`orders/success/${id}`, "PUT", null, token);
+    if (res && res.status === 200) {
+      toast.success("Complete order is success");
+      dispatch(actEditOrder(res.data));
+    }
+    // dispatch(actConfirmOrder(data));
   };
 };
 

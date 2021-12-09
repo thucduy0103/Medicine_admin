@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import './style.css'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { actFetchOrdersRequest, actDeleteOrderRequest, actFindOrdersRequest } from '../../../redux/actions/order';
+import { actFetchOrdersRequest, actDeleteOrderRequest, actFindOrdersRequest, actConfirmOrderRequest, actSuccessOrderRequest } from '../../../redux/actions/order';
 import Swal from 'sweetalert2'
 import Moment from 'react-moment';
 import withReactContent from 'sweetalert2-react-content'
@@ -19,7 +19,7 @@ class Order extends Component {
     this.state = {
       searchText: '',
       total: 0,
-      currentPage: 1
+      currentPage: 1,
     }
   }
 
@@ -32,21 +32,69 @@ class Order extends Component {
     token = localStorage.getItem('_auth');
     this.props.fetch_orders(token).then(res => {
       this.setState({
-        total: res.total
+        total: res.totalResults
       });
     }).catch(err => {
-      console.log(err);  
+      console.log(err);
     })
   }
 
   pageChange(content){
     const limit = 10;
-    const offset = limit * (content - 1);
-    this.props.fetch_orders(token, offset);
+    const nextPage = content
+    this.props.fetch_orders(token, nextPage);
     this.setState({
       currentPage: content
     })
     window.scrollTo(0, 0);
+  }
+
+  handleSend = (id) => {
+    MySwal.fire({
+      title: 'Confirm',
+        html:
+        '<label className="col-sm-3 form-control-label">Shipping Code</label> <input id="swal-input1" className="form-control">' +
+        '<label className="col-sm-3 form-control-label">Shipping Total</label> <input id="swal-input2" className="form-control">',
+        focusConfirm: false,
+        preConfirm: () => {
+          const shippingCode = document.getElementById('swal-input1').value
+          const shippingTotal = document.getElementById('swal-input2').value
+          if (shippingCode == '' || shippingTotal == '') {
+            Swal.fire(
+              'Confirm!',
+              'Your order has not been confirmed.',
+              'error'
+            )
+            return {
+              shippingCode,
+              shippingTotal
+            }
+          }else {
+            return {
+              shippingCode,
+              shippingTotal
+            }
+          }
+      }
+    }).then(async (result) => {
+      if (result.value != null) {
+        await this.props.confirm_order(id, result.value, token)
+      }
+    })
+  }
+
+  handleSuccess = (id) => {
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: "You want to complete the order",
+      icon: 'success',
+      showCancelButton: true,
+      confirmButtonText: 'Yes'
+    }).then(async (result) => {
+      if (result.value) {
+        await this.props.success_order(id, token);
+      }
+    })
   }
 
   handleRemove = (id) => {
@@ -85,7 +133,7 @@ class Order extends Component {
     this.props.find_order(token, searchText).then(res => {
       this.setState({
         total: res.total
-      }) 
+      })
     })
   }
 
@@ -95,34 +143,48 @@ class Order extends Component {
   }
 
   showOrder(status){
-    if (status === 'Unconfirm') { 
+    if (status === 'Unconfirm') {
       return (<div className="col-md-3"><label className="fix-status" style={{background: '#ff9800'}} >{status}</label></div>)
-    
     }
     if (status === 'Confirm') {
       return (
         <div className="col-md-3"><label className="fix-status" style={{background: '#337ab7'}} >{status}</label></div>
       )
-     
     }
     if (status === 'Shipping') {
       return (
-   <div className="col-md-3"><label className="fix-status" style={{background: '#634a41'}} >{status}</label></div>
+        <div className="col-md-3"><label className="fix-status" style={{background: '#634a41'}} >{status}</label></div>
       )
-      
     }
     if (status === 'Complete') {
       return (
         <div className="col-md-3"><label className="fix-status" style={{background: '#5cb85c'}} >{status}</label></div>
       )
-     
     }
     if (status === 'Canceled') {
       return (
         <div className="col-md-3"><label className="fix-status" style={{background: '#d9534f'}} >{status}</label></div>
       )
-     
     }
+  }
+
+  showButton(item){
+    let buttonConfirm;
+    let buttonSuccess;
+    if (item.orderStatus == "Unconfirm") {
+      buttonConfirm = <span title='Confirm' onClick={() => this.handleSend(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-paper-plane"></i></Link></span>
+    }
+    if (item.orderStatus == "Confirm") {
+      buttonSuccess = <span title='Success' onClick={() => this.handleSuccess(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-check" style={{ color: '#33FF66	' }}></i></Link></span>
+    }
+    return (
+      <div>
+        {buttonConfirm}
+        {buttonSuccess}
+        <span title='View' className="fix-action"><Link to={`/orders/view/${item.id}`}> <i className="fa fa-eye"></i></Link></span>
+        <span title='Delete' onClick={() => this.handleRemove(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-trash" style={{ color: '#ff00008f' }}></i></Link></span>
+      </div>
+    )
   }
 
   render() {
@@ -177,14 +239,10 @@ class Order extends Component {
                             {/* <th>Address</th> */}
                             <th>Phone</th>
                             <th>Status</th>
-                            <th>Paid</th>
-                            <th style={{ textAlign: "center" }}>Payment Online</th>
                             <th>Item Amount</th>
                             <th>Shipping Total</th>
-                            <th>Promo Total </th>
                             <th>Total Amount</th>
-                            <th>Note</th>
-                            <th>Code</th>
+                            {/* <th>Code</th> */}
                             <th>Created At</th>
                             <th>Action</th>
                           </tr>
@@ -194,44 +252,21 @@ class Order extends Component {
                             return (
                               <tr key={index}>
                                 <th scope="row">{index + 1}</th>
-                                <td>{item.fullName}</td>
+                                <td>{item.receiverName}</td>
                                 {/* <td>{item.address}</td> */}
-                                <td>{item.phone}</td>
-                                <td>{this.showOrder(item.status)} </td>
-                                <td>{item.isPaid ?
-                                  <div className="i-checks">
-                                    <input type="checkbox" onChange={()=>{}} checked={true} className="checkbox-template" />
-                                  </div>
-                                  :
-                                  <div className="i-checks">
-                                    <input type="checkbox" onChange={()=>{}} checked={false} className="checkbox-template" />
-                                  </div>}
-                                </td>
-                                <td style={{ textAlign: "center" }}>{item.isPaymentOnline ?
-                                  <div className="i-checks">
-                                    <input type="checkbox" onChange={()=>{}} checked={true} className="checkbox-template" />
-                                  </div>
-                                  :
-                                  <div className="i-checks">
-                                    <input type="checkbox" onChange={()=>{}} checked={false} className="checkbox-template" />
-                                  </div>}
-                                </td>
-                                <td>{item.itemAmount}</td>
+                                <td>{item.phoneNumber}</td>
+                                <td>{this.showOrder(item.orderStatus)}</td>
+                                <td>{item.listCart.length}</td>
                                 <td>{item.shippingTotal}</td>
-                                <td>{item.promoTotal}</td>
                                 <td>{item.totalAmount}</td>
-                                <td>{item.note}</td>
-                                <td>{item.id}</td>
+                                {/*<td>{item.id}</td> */}
                                 <td>
-                                  <Moment format="YYYY/MM/DD">
+                                  <Moment format="DD/MM/YYYY">
                                     {item.createdAt}
                                   </Moment>
                                 </td>
                                 <td>
-                                  <div>
-                                    <span title='Edit' className="fix-action"><Link to={`/orders/edit/${item.id}`}> <i className="fa fa-edit"></i></Link></span>
-                                    <span title='Delete' onClick={() => this.handleRemove(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-trash" style={{ color: '#ff00008f' }}></i></Link></span>
-                                  </div>
+                                  {this.showButton(item)}
                                 </td>
                               </tr>
                             )
@@ -274,6 +309,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     delete_order: (id, token) => {
       dispatch(actDeleteOrderRequest(id, token))
+    },
+    confirm_order: (id, data, token) => {
+      dispatch(actConfirmOrderRequest(id, data, token))
+    },
+    success_order: (id, token) => {
+      dispatch(actSuccessOrderRequest(id, token))
     },
     find_order: (token, searchText) => {
       return dispatch(actFindOrdersRequest(token, searchText))

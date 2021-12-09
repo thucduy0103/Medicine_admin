@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import MyFooter from '../../MyFooter/MyFooter'
 import { actAddCategoryRequest, actGetCategoryRequest, actEditCategoryRequest } from '../../../redux/actions/category';
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import callApi from '../../../utils/apiCaller';
 import { uploadImage } from '../../../utils/upload'
 import { css } from '@emotion/core';
@@ -176,7 +176,7 @@ class ActionCategory extends Component {
                       <div className="line" />
                       <div className="form-group row">
                         <div className="col-sm-4 offset-sm-3">
-                          <button type="reset" className="btn btn-secondary" style={{ marginRight: 2 }}>Cancel</button>
+                          <Link to="/categories" className="btn btn-secondary" style={{ marginRight: 2 }}>Cancel</Link>
                           <button type="submit" className="btn btn-primary">Save changes</button>
                         </div>
                       </div>

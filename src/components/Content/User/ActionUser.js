@@ -3,7 +3,7 @@ import MyFooter from '../../MyFooter/MyFooter'
 import { connect } from 'react-redux'
 import callApi from '../../../utils/apiCaller';
 import { actAddUserRequest, actGetUserRequest, actEditUserRequest } from '../../../redux/actions/user';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import { uploadImage } from '../../../utils/upload'
 import { css } from '@emotion/core';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -245,7 +245,7 @@ class ActionUser extends Component {
                       <div className="line" />
                       <div className="form-group row">
                         <div className="col-sm-4 offset-sm-3">
-                          <button type="reset" className="btn btn-secondary" style={{ marginRight: 2 }}>Cancel</button>
+                          <Link to="/users" className="btn btn-secondary" style={{ marginRight: 2 }}>Cancel</Link>
                           <button type="submit" className="btn btn-primary">Save changes</button>
                         </div>
                       </div>
