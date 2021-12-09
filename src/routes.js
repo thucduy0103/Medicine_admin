@@ -18,6 +18,7 @@ import ActionProducerPage from './pages/ActionProducerPage';
 import RatingPage from './pages/RatingPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
+import ChatPage from './pages/ChatPage';
 
 
 const routes = [
@@ -150,6 +151,11 @@ const routes = [
     path: '/producers/edit/:id',
     exact: false,
     main: ({ match, history }) => <ActionProducerPage match={match} history={history} />
+  },
+  {
+    path: '/chat',
+    exact: false,
+    main: () => <ChatPage />
   }
 
 ]

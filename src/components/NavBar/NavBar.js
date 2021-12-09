@@ -55,6 +55,7 @@ class NavBar extends Component {
             <li><Link to="/users"> <i className="icon icon-user" />Users</Link></li>
             <li><Link to="/roles"> <i className="icon icon-bars" />Roles</Link></li>
             <li> <Link to="/contacts"> <i className="icon-mail" />Contacts </Link></li>
+            <li> <Link to="/chat"> <i className="icon-paper-airplane" />Chat</Link></li>
           </ul>
           :
           <ul className="list-unstyled">
