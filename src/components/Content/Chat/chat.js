@@ -8,8 +8,10 @@ import withReactContent from "sweetalert2-react-content"
 import Paginator from "react-js-paginator"
 import { connect } from "react-redux"
 import './style.css'
+import { io } from 'socket.io-client'
 const MySwal = withReactContent(Swal)
 
+const socket = io("http://teamedicine.tk:3000")
 
 class Chat extends Component {
 
@@ -75,11 +77,25 @@ class Chat extends Component {
                 }
             ],
             message: ""
-
         }
     }
 
     componentDidMount() {
+        socket.on("connect", () => {
+            console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+          })
+    }
+
+    componentWillMount() {
+        // id dang de tam la 'anhkhoa'
+        socket.emit('join_room', {
+            room: 'anhkhoa'
+        });
+
+        // ON RECEIVE MESSAGE - push message vao currentConversation
+        socket.on('res_chat_text', (data) => {
+            console.log(data);
+        })
     }
 
     onClickUserMenu(e, user) {
@@ -98,6 +114,10 @@ class Chat extends Component {
             time: "12:00",
             sender: "me"
         }
+        socket.emit('chat_text', {roomId: 'anhkhoa', roomName: "sdfdsfsd", message: this.state.message});
+
+
+        // SET STATE tạm de show message
         this.setState({
             currentConversation: [...this.state.currentConversation, newMessage]
         }, () => {
