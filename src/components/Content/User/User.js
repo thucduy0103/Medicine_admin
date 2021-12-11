@@ -36,7 +36,6 @@ class User extends Component {
     })
   }
   pageChange(content){
-    const limit = 10;
     // const offset = limit * (content - 1);
     const nextPage = content
     this.props.fetch_users(token, nextPage);
@@ -138,6 +137,7 @@ class User extends Component {
                         <thead>
                           <tr>
                             <th>Number</th>
+                            <th>Avatar</th>
                             <th>Email</th>
                             <th>Name</th>
                             <th style={{textAlign: "center"}}>Admin</th>
@@ -150,6 +150,11 @@ class User extends Component {
                             return (
                               <tr key={index}>
                                 <th scope="row">{index + 1}</th>
+                                <td style={{ textAlign: "center" }}>
+                                    <div className="fix-cart2">
+                                      <img src={item.avatar} className="fix-img2" alt="avatar" />
+                                    </div>
+                                </td>
                                 <td>{item.email}</td>
                                 <td>{item.name}</td>
                                 <td style={{textAlign: "center"}}>

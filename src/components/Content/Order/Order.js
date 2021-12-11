@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import './style.css'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { actFetchOrdersRequest, actDeleteOrderRequest, actFindOrdersRequest, actConfirmOrderRequest, actSuccessOrderRequest } from '../../../redux/actions/order';
+import { actFetchOrdersRequest, actDeleteOrderRequest, actFindOrdersRequest, actConfirmOrderRequest, actSuccessOrderRequest,actShippingOrderRequest } from '../../../redux/actions/order';
 import Swal from 'sweetalert2'
 import Moment from 'react-moment';
 import withReactContent from 'sweetalert2-react-content'
@@ -40,7 +40,6 @@ class Order extends Component {
   }
 
   pageChange(content){
-    const limit = 10;
     const nextPage = content
     this.props.fetch_orders(token, nextPage);
     this.setState({
@@ -59,7 +58,7 @@ class Order extends Component {
         preConfirm: () => {
           const shippingCode = document.getElementById('swal-input1').value
           const shippingTotal = document.getElementById('swal-input2').value
-          if (shippingCode == '' || shippingTotal == '') {
+          if (shippingCode === '' || shippingTotal === '') {
             Swal.fire(
               'Confirm!',
               'Your order has not been confirmed.',
@@ -93,6 +92,20 @@ class Order extends Component {
     }).then(async (result) => {
       if (result.value) {
         await this.props.success_order(id, token);
+      }
+    })
+  }
+
+  handleShipping = (id) => {
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: "You want to Shipping the order",
+      icon: 'success',
+      showCancelButton: true,
+      confirmButtonText: 'Yes'
+    }).then(async (result) => {
+      if (result.value) {
+        await this.props.shipping_order(id, token);
       }
     })
   }
@@ -170,16 +183,21 @@ class Order extends Component {
 
   showButton(item){
     let buttonConfirm;
+    let buttonShipping;
     let buttonSuccess;
-    if (item.orderStatus == "Unconfirm") {
+    if (item.orderStatus === "Unconfirm") {
       buttonConfirm = <span title='Confirm' onClick={() => this.handleSend(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-paper-plane"></i></Link></span>
     }
-    if (item.orderStatus == "Confirm") {
-      buttonSuccess = <span title='Success' onClick={() => this.handleSuccess(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-check" style={{ color: '#33FF66	' }}></i></Link></span>
+    if (item.orderStatus === "Confirm") {
+      buttonShipping = <span title='Shipping' onClick={() => this.handleShipping(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-archive" style={{ color: '#000000' }}></i></Link></span>
+    }
+    if (item.orderStatus === "Shipping") {
+      buttonSuccess = <span title='Success' onClick={() => this.handleSuccess(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-check" style={{ color: '#33FF66' }}></i></Link></span>
     }
     return (
       <div>
         {buttonConfirm}
+        {buttonShipping}
         {buttonSuccess}
         <span title='View' className="fix-action"><Link to={`/orders/view/${item.id}`}> <i className="fa fa-eye"></i></Link></span>
         <span title='Delete' onClick={() => this.handleRemove(item.id)} className="fix-action"><Link to="#"> <i className="fa fa-trash" style={{ color: '#ff00008f' }}></i></Link></span>
@@ -312,6 +330,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     confirm_order: (id, data, token) => {
       dispatch(actConfirmOrderRequest(id, data, token))
+    },
+    shipping_order: (id, token) => {
+      dispatch(actShippingOrderRequest(id, token))
     },
     success_order: (id, token) => {
       dispatch(actSuccessOrderRequest(id, token))

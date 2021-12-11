@@ -71,7 +71,6 @@ class ActionUser extends Component {
   handleChangePassword = (event) => {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
     this.setState({
       password: value
     });
@@ -106,7 +105,7 @@ class ActionUser extends Component {
       }
 
       var roleName = "user"
-      if (roleId == 0) {
+      if (roleId === 0) {
         roleName = "admin"
       }
       const newUser = {
@@ -131,7 +130,7 @@ class ActionUser extends Component {
       })
     } else {
       var roleName = "user"
-      if (roleId == 0) {
+      if (roleId === 0) {
         roleName = "admin"
       }
       const editUser = {

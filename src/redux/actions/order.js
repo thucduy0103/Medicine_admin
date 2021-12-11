@@ -110,7 +110,16 @@ export const actSuccessOrderRequest = (id, token) => {
       toast.success("Complete order is success");
       dispatch(actEditOrder(res.data));
     }
-    // dispatch(actConfirmOrder(data));
+  };
+};
+
+export const actShippingOrderRequest = (id, token) => {
+  return async dispatch => {
+    const res = await callApi(`orders/shipping/${id}`, "PUT", null, token);
+    if (res && res.status === 200) {
+      toast.success("Shipping order is success");
+      dispatch(actEditOrder(res.data));
+    }
   };
 };
 

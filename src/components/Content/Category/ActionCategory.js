@@ -104,7 +104,7 @@ class ActionCategory extends Component {
 
 
   render() {
-    const { isActive, name, desc, redirectToCategory, loading, image } = this.state;
+    const { isActive, name, redirectToCategory, loading, image } = this.state;
     if (redirectToCategory) {
       return <Redirect to='/categories'></Redirect>
     }

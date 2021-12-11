@@ -78,7 +78,7 @@ class ActionOrder extends Component {
   }
 
   render() {
-    const { dataOrderDetails, provinces, states, fullName, address, note, code, phone, totalAmount, shippingTotal, shippingUnit, status,statusString, redirectToOrder } = this.state;
+    const { dataOrderDetails, fullName, address, code, phone, totalAmount, shippingTotal, shippingUnit, status,statusString, redirectToOrder } = this.state;
     let orderDetailAmount = 0;
     if (dataOrderDetails.length > 0) {
       orderDetailAmount = dataOrderDetails.reduce((sum, item) => {

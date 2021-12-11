@@ -10,7 +10,7 @@ export const actFetchContactsRequest = (token, offset) => {
   return dispatch => {
     dispatch(actShowLoading());
     return new Promise((resolve, reject) => {
-      callApi(`users/message?limit=${limit}&offset=${newOffset}&orderBy=-createdAt`, 'GET', null, token)
+      callApi(`chat?limit=${limit}&page=${newOffset}&sortBy=-createdAt`, 'GET', null, token)
         .then(res => {
           if(res && res.status === 200) {
             dispatch(actFetchContacts(res.data.results));
@@ -39,7 +39,7 @@ export const actFindContactsRequest = (token, searchText) => {
   dispatch(actShowLoading());
   return new Promise((resolve, reject) => {
     if (searchText !== undefined && searchText !== null && searchText !== '') {
-      callApi(`contacts?q=${searchText}`, 'GET', null, token)
+      callApi(`chat?q]search=${searchText}`, 'GET', null, token)
       .then(res => {
         if(res && res.status === 200) {
           dispatch(actFindContacts(res.data.results));
@@ -53,7 +53,7 @@ export const actFindContactsRequest = (token, searchText) => {
         setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
       });
     } else {
-      callApi('contacts', 'GET', null, token)
+      callApi('chat', 'GET', null, token)
       .then(res => {
         if(res && res.status === 200) {
           dispatch(actFindContacts(res.data.results));
@@ -80,7 +80,7 @@ export const actFindContacts = (contacts) => {
 
 export const actDeleteContactRequest = (id, token) => {
   return async dispatch => {
-    await callApi(`contacts/${id}`, 'DELETE', null, token);
+    await callApi(`chat/${id}`, 'DELETE', null, token);
     dispatch(actDeleteContact(id));
   }
 }
@@ -94,7 +94,7 @@ export const actDeleteContact = (id) => {
 
 export const actAddContactRequest = (token, data) => {
   return async dispatch => {
-    const res = await callApi('contacts', 'POST', data, token);
+    const res = await callApi('chat', 'POST', data, token);
     if (res && res.status === 200) {
       toast.success('Add new Contact is success')
       dispatch(actAddContact(res.data));
@@ -111,13 +111,13 @@ export const actAddContact = (data) => {
 
 export const actGetContactRequest = (token, id) => {
   return async dispatch => {
-    await callApi(`contacts/${id}`, 'GET', null, token);
+    const res = await callApi(`chat/${id}`, 'GET', null, token);
   };
 }
 
 export const actEditContactRequest = (token, id, data) => {
   return async dispatch => {
-    const res = await callApi(`contacts/${id}`, 'PUT', data, token);
+    const res = await callApi(`chat/${id}`, 'PUT', data, token);
     if (res && res.status === 200) {
       await dispatch(actEditContact(res.data));
       toast.success('Edit Contact is success')

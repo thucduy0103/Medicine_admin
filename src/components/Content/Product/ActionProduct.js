@@ -142,7 +142,7 @@ class ActionProduct extends Component {
       newStateArray.push(target.value);
     }else {
       newStateArray = newStateArray.filter(function(ele){
-          return ele != target.value;
+          return ele !== target.value;
       });
     }
     this.setState({
@@ -159,7 +159,7 @@ class ActionProduct extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const {files, dataGallery, nameProduct, price, discountPrice, numberAvailable, unit, category, desc, properties, productionDate, expiryDate } = this.state;
+    const {files, dataGallery, nameProduct, price, discountPrice, numberAvailable, unit, category, desc, productionDate, expiryDate } = this.state;
     let { image, img } = this.state;
     let newFiles = dataGallery;
     this.setState({
@@ -178,7 +178,6 @@ class ActionProduct extends Component {
     const newName = nameProduct === '' ? null : nameProduct;
     const newImage = image === '' ? null : image;
     const newGallery = newFiles && newFiles.length === 0 ? null : newFiles;
-    const newProperties = properties === {} ? null : properties;
     const newNumberAvailable = parseInt(numberAvailable);
     const newProductionDate = productionDate
     const newExpiryDate =  expiryDate
@@ -259,7 +258,7 @@ class ActionProduct extends Component {
   ];
 
   render() {
-    const { dataGallery, nameProduct, loading, price, discountPrice, numberAvailable, unit, category, image, desc, producerId, redirectToProduct, dataCategories, productionDate, expiryDate } = this.state;
+    const { dataGallery, nameProduct, loading, price, discountPrice, numberAvailable, unit, category, image, desc, redirectToProduct, dataCategories, productionDate, expiryDate } = this.state;
     let files;
     if(dataGallery && dataGallery.length !== 0) {
       files = dataGallery.map((file, index) => {
