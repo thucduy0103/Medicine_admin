@@ -23,58 +23,38 @@ class Chat extends Component {
             currentPage: 1,
             users: [
                 {
-                    id: 1,
-                    name: "Nguyễn Văn A",
+                    id: "61a075aa4c2e2dabf7c7c7e8",
+                    name: "Nguyễn Đình Khoa",
                     avatar: "https://i.imgur.com/53l2KD5.jpg"
                 },
                 {
-                    id: 2,
-                    name: "Nguyễn Văn B",
+                    id: "61b701afce6d1c869431ac74",
+                    name: "Khoa Nguyễn Đình",
                     avatar: "https://i.imgur.com/53l2KD5.jpg"
                 },
                 {
-                    id: 3,
-                    name: "Nguyễn Văn C",
+                    id: "61a075aa4c2e2dabf7c7c7e8",
+                    name: "Hồ Duy Thức",
                     avatar: "https://i.imgur.com/53l2KD5.jpg"
                 },
                 {
-                    id: 4,
-                    name: "Nguyễn Văn D",
+                    id: "61a075aa4c2e2dabf7c7c7e8",
+                    name: "Obama",
                     avatar: "https://i.imgur.com/53l2KD5.jpg"
                 },
                 {
-                    id: 5,
-                    name: "Nguyễn Văn E",
+                    id: "61b701afce6d1c869431ac74",
+                    name: "Justin Bieber",
                     avatar: "https://i.imgur.com/53l2KD5.jpg"
                 }
             ],
             currentUser: {
-                id: 1,
-                name: "Nguyễn Văn A",
+                id: "61a075aa4c2e2dabf7c7c7e8",
+                name: "Nguyễn Đình Khoa",
                 avatar: "https://i.imgur.com/53l2KD5.jpg"
             },
             currentConversation: [
-                {
-                    id: 1,
-                    avatar: "https://i.imgur.com/53l2KD5.jpg",
-                    text: "Hello",
-                    time: "12:00",
-                    sender: "me"
-                },
-                {
-                    id: 2,
-                    avatar: "https://i.imgur.com/53l2KD5.jpg",
-                    text: "Hello",
-                    time: "12:00",
-                    sender: "other"
-                },
-                {
-                    id: 3,
-                    avatar: "https://i.imgur.com/53l2KD5.jpg",
-                    text: "DCM",
-                    time: "12:00",
-                    sender: "me"
-                }
+                
             ],
             message: ""
         }
@@ -82,54 +62,90 @@ class Chat extends Component {
 
     componentDidMount() {
         socket.on("connect", () => {
-            console.log(socket.id); // x8WIv7-mJelg7on_ALbx
-          })
-    }
-
-    componentWillMount() {
-        // id dang de tam la 'anhkhoa'
-        socket.emit('join_room', {
-            room: 'anhkhoa'
-        });
-
-        // ON RECEIVE MESSAGE - push message vao currentConversation
-        socket.on('res_chat_text', (data) => {
-            console.log(data);
+            console.log(socket.id) // x8WIv7-mJelg7on_ALbx
+            socket.emit('join_room', {
+                room: this.state.currentUser.id,
+            })
         })
     }
 
+    componentWillMount() {
+        // ON RECEIVE MESSAGE - push message vao currentConversation
+        socket.on('res_chat_text', (data) => {
+            this.setState({
+                currentConversation: [...this.state.currentConversation, {
+                    id: 69,
+                    avatar: "https://i.imgur.com/53l2KD5.jpg",
+                    text: data.message,
+                    time: "12:00",
+                    sender: data.senderId === 'admin' ? "me" : "other"
+                }]
+            }, () => {
+                this.onScrollToEnd()
+            })
+        })
+    }
+
+    //FETCH
+    onFetchContacts() {
+
+    }
+
+
     onClickUserMenu(e, user) {
         e.preventDefault()
+
+        // CHANGE CURRENT USER & fetch conversations
         this.setState({
-            currentUser: user
+            currentUser: user,
+            currentConversation: []
+        }, () => {
+            socket.emit('join_room', {
+                room: this.state.currentUser.id,
+            })
         })
     }
 
     onClickSendMessage(e) {
         e.preventDefault()
-        let newMessage = {
-            id: 69,
-            avatar: "https://i.imgur.com/53l2KD5.jpg",
-            text: this.state.message,
-            time: "12:00",
-            sender: "me"
+
+        if (this.state.message === "") {
+            return
         }
-        socket.emit('chat_text', {roomId: 'anhkhoa', roomName: "sdfdsfsd", message: this.state.message});
 
-
-        // SET STATE tạm de show message
         this.setState({
-            currentConversation: [...this.state.currentConversation, newMessage]
+            currentConversation: [...this.state.currentConversation, {
+                id: 69,
+                avatar: "https://i.imgur.com/53l2KD5.jpg",
+                text: this.state.message,
+                time: "12:00",
+                sender: "me"
+            }]
         }, () => {
+            socket.emit('chat_text', {
+                roomId: this.state.currentUser.id,
+                roomName: 'Khoa Đẹp Trai',
+                senderId: 'admin',
+                message: this.state.message
+            })
+
             this.setState({
                 message: ""
             })
+            this.onScrollToEnd()
         })
+    }
+
+    onScrollToEnd() {
+        var objDiv = document.getElementById('main-chat-logs')
+        objDiv.scrollTop = objDiv.scrollHeight
     }
 
     onChangeText(e) {
         e.preventDefault()
-        this.setState({ message: e.target.value })
+        this.setState({
+            message: e.target.value
+        })
     }
 
     onKeyDownMessage(e) {
@@ -138,6 +154,7 @@ class Chat extends Component {
         }
     }
 
+    // RENDER
     render() {
         let { contacts } = this.props
         const { searchText, total } = this.state
@@ -188,7 +205,7 @@ class Chat extends Component {
                                         {this.state.currentUser.name}
                                     </div>
                                 </div>
-                                <div className="chat-admin__main-content">
+                                <div className="chat-admin__main-content" id='main-chat-logs'>
                                     {this.state.currentConversation.map((conversation, index) => {
                                         return (
                                             <div className={`chat-admin__main-content-item ${conversation.sender}`} key={index}>
@@ -203,7 +220,7 @@ class Chat extends Component {
                                         value={this.state.message} onChange={(e) => this.onChangeText(e)}
                                         onKeyDown={(e) => this.onKeyDownMessage(e)}
                                         className="chat-admin__main-footer-input" />
-                                    <button className="chat-admin__main-footer-send" onClick={(e) => this.onClickSendMessage(e)}>Send</button>
+                                    <button className="chat-admin__main-footer-send" onClick={(e) => this.onClickSendMessage(e)}><i className="icon-paper-airplane" /></button>
                                 </div>
                             </div>
                         </div>
