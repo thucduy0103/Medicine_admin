@@ -12,7 +12,7 @@ import './style.css'
 import { io } from 'socket.io-client'
 const MySwal = withReactContent(Swal);
 
-const socket = io("http://teamedicine.tk:3000")
+const socket = io("http://localhost:3000")
 let token;
 
 class Contact extends Component {

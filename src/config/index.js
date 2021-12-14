@@ -1,6 +1,7 @@
 export const config = {
   api: {
-    url: 'http://localhost:3000/api/v1'
+    url: 'http://localhost:3000/api/v1',
+    // url: 'http://teamedicine:3000/api/v1'
   },
   firebaseConfig: {
     apiKey: "AIzaSyCWng8lpwKbKitObOaKEym6LpzztTDLTnw",
