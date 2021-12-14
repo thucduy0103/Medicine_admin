@@ -140,7 +140,6 @@ class Category extends Component {
                             <th>Number</th>
                             <th>Name</th>
                             <th>Image</th>
-                            <th style={{ textAlign: "center" }}>Active</th>
                             <th style={{ textAlign: "center" }}>Action</th>
                           </tr>
                         </thead>
@@ -154,16 +153,7 @@ class Category extends Component {
                                     <div className="fix-cart2">
                                       <img src={item.image} className="fix-img2" alt="avatar" />
                                     </div>
-                                </td>
-                                <td style={{ textAlign: "center" }}>{item.isActive ?
-                                  <div className="i-checks">
-                                    <input type="checkbox" checked={true} onChange={() => this.handleChangeCheckBox} className="checkbox-template" />
-                                  </div>
-                                  :
-                                  <div className="i-checks">
-                                    <input type="checkbox" checked={false} onChange={() => this.handleChangeCheckBox} className="checkbox-template" />
-                                  </div>}
-                                </td>
+                                </td>                                
                                 <td style={{ textAlign: "center" }}>
                                   <div>
                                     <span title='Edit' className="fix-action"><Link to={`categories/edit/${item.id}`}> <i className="fa fa-edit"></i></Link></span>
