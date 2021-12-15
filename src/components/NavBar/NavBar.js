@@ -33,10 +33,10 @@ class NavBar extends Component {
         {(nameRole === 'superadmin' || nameRole === 'admin') ?
           <ul className="list-unstyled">
             <li><Link to="/"> <i className="icon-home" />Home </Link></li>
+            <li><Link to="/home-page"> <i className="icon icon-list-1" />Main-home</Link></li>
             <li><Link to="/orders"> <i className="icon icon-bill" />Orders</Link></li>
             <li><Link to="/categories"> <i className="icon-interface-windows" />Categories</Link></li>
             <li><Link to="/products"> <i className="icon icon-website" />Products</Link></li>
-            {/*<li><Link to="/producers"> <i className="icon icon-list-1" />Producer</Link></li> */}
             {/* <li><Link to="/discounts"> <i className="icon icon-check" />Discount</Link></li> */}
             {/* <li><Link to="/ratings">  <i className="icon icon-check" />Rating</Link></li> */}
             <li><Link to="/users"> <i className="icon icon-user" />Users</Link></li>

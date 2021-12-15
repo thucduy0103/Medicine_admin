@@ -12,7 +12,7 @@ import './style.css'
 import { io } from 'socket.io-client'
 const MySwal = withReactContent(Swal);
 
-const socket = io("http://teamedicine.tk:3000")
+const socket = io("http://localhost:3000")
 let token;
 
 class Contact extends Component {
@@ -65,12 +65,15 @@ class Contact extends Component {
       componentWillMount() {
           // id dang de tam la 'anhkhoa'
           socket.emit('join_room', {
-              room: 'anhkhoa'
+              room: '61b81359ab57570380718254'
           });
 
           // ON RECEIVE MESSAGE - push message vao currentConversation
           socket.on('res_chat_text', (data) => {
               console.log(data);
+          })
+          socket.on('new_room', (data) => {
+              console.log("new_room"+data);
           })
       }
 
@@ -111,8 +114,7 @@ class Contact extends Component {
               time: "12:00",
               sender: "me"
           }
-          socket.emit('chat_text', {roomId: 'anhkhoa', roomName: "sdfdsfsd", message: this.state.message});
-
+          socket.emit('chat_text', {roomId: '61b81359ab57570380718254', senderId: "", message: this.state.message});
 
           // SET STATE tạm de show message
           this.setState({
@@ -166,7 +168,7 @@ class Contact extends Component {
                               </div>
                               {contacts && contacts.length ? contacts.map((item, index) => {
                                   return (
-                                      <div className="chat-admin__menu-item" key={index} onClick={() => this.onClickUserMenu(item.id)}>
+                                      <div className="chat-admin__menu-item" key={index} onClick={() => this.onClickUserMenu(item.roomId)}>
                                           <div className="chat-admin__menu-item-avatar">
                                               <img src={item.roomAvatar} alt="" />
                                           </div>

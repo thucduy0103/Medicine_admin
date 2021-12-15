@@ -23,7 +23,6 @@ class ActionCategory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isActive: true,
       name: '',
       image: '',
       redirectToCategory: false,
@@ -38,7 +37,6 @@ class ActionCategory extends Component {
     if (id) {
       const res = await callApi(`categories/${id}`, 'GET', null, token);
       this.setState({
-        isActive: res.data.isActive,
         name: res.data.name,
         image: res.data.image,
       })
@@ -65,7 +63,7 @@ class ActionCategory extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { isActive, name } = this.state;
+    const { name } = this.state;
     let { img, image } = this.state;
     this.setState({
       loading: true
@@ -78,7 +76,6 @@ class ActionCategory extends Component {
     const newName = name === '' ? null : name;
     if (!id) {
       const newCategory = {
-        isActive,
         name: newName,
         slug: newName,
         image: newImage
@@ -90,7 +87,6 @@ class ActionCategory extends Component {
       })
     } else {
       const editCategory = {
-        isActive,
         name: newName,
         image: newImage
       }
@@ -104,7 +100,7 @@ class ActionCategory extends Component {
 
 
   render() {
-    const { isActive, name, redirectToCategory, loading, image } = this.state;
+    const { name, redirectToCategory, loading, image } = this.state;
     if (redirectToCategory) {
       return <Redirect to='/categories'></Redirect>
     }
@@ -159,21 +155,7 @@ class ActionCategory extends Component {
                           </div>
                        </div>
                       </div>
-                      <div className="line" />
-                      <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Active</label>
-                        <div className="col-sm-9">
-                          <div className="i-checks">
-                            <input type="checkbox"
-                              onChange={this.handleChange}
-                              name="isActive"
-                              checked={isActive}
-                              className="checkbox-template" />
-                            <label htmlFor="checkboxCustom1"></label>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="line" />
+                      <div className="line" />                      
                       <div className="form-group row">
                         <div className="col-sm-4 offset-sm-3">
                           <Link to="/categories" className="btn btn-secondary" style={{ marginRight: 2 }}>Cancel</Link>

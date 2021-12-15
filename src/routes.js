@@ -63,7 +63,7 @@ const routes = [
     main: () => <RolePage />
   },
   {
-    path: '/producers',
+    path: '/home-page',
     exact: true,
     main: () => <ProducerPage />
   },

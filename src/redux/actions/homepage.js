@@ -4,16 +4,16 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { actShowLoading, actHiddenLoading } from './loading'
 
-export const actFetchProducersRequest = (token, offset) => {
+export const actFetchHomepagesRequest = (token, offset) => {
   const newOffset = offset === null || offset === undefined ? 0 : offset;
   const limit = 10;
   return dispatch => {
     dispatch(actShowLoading());
     return new Promise((resolve, reject) => {
-      callApi(`products?limit=${limit}&page=${newOffset}`, 'GET', null, token)
+      callApi(`categories?limit=${limit}&page=${newOffset}&sortBy=-createdAt`, 'GET', null, token)
         .then(res => {
           if (res && res.status === 200) {
-            dispatch(actFetchProducers(res.data.results));
+            dispatch(actFetchHomepages(res.data.results));
             resolve(res.data);
             setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
           }
@@ -27,22 +27,22 @@ export const actFetchProducersRequest = (token, offset) => {
   };
 };
 
-export const actFetchProducers = (producers) => {
+export const actFetchHomepages = (homepages) => {
   return {
-    type: Types.FETCH_PRODUCERS,
-    producers
+    type: Types.FETCH_HOMEPAGES,
+    homepages
   }
 }
 
-export const actFindProducersRequest = (token, searchText) => {
+export const actFindHomepagesRequest = (token, searchText) => {
   return dispatch => {
   dispatch(actShowLoading());
   return new Promise((resolve, reject) => {
     if (searchText !== undefined && searchText !== null && searchText !== '') {
-      callApi(`producers/search-product?search=${searchText}`, 'GET', null, token)
+      callApi(`categories/search-product?search=${searchText}`, 'GET', null, token)
       .then(res => {
         if (res && res.status === 200) {
-          dispatch(actFindProducers(res.data.results));
+          dispatch(actFindHomepages(res.data.results));
           resolve(res.data);
           setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
         }
@@ -53,10 +53,10 @@ export const actFindProducersRequest = (token, searchText) => {
         setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
       });
     } else {
-      callApi('producers', 'GET', null, token)
+      callApi('categories', 'GET', null, token)
       .then(res => {
         if (res && res.status === 200) {
-          dispatch(actFindProducers(res.data.results));
+          dispatch(actFindHomepages(res.data.results));
           resolve(res.data);
           setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
         }
@@ -71,63 +71,63 @@ export const actFindProducersRequest = (token, searchText) => {
 }
 }
 
-export const actFindProducers = (producers) => {
+export const actFindHomepages = (homepages) => {
   return {
-    type: Types.FIND_PRODUCERS,
-    producers
+    type: Types.FIND_HOMEPAGES,
+    homepages
   }
 }
 
-export const actDeleteProducerRequest = (id, token) => {
+export const actDeleteHomepageRequest = (id, token) => {
   return async dispatch => {
-    await callApi(`producers/${id}`, 'DELETE', null, token);
-    dispatch(actDeleteProducer(id));
+    await callApi(`categories/${id}`, 'DELETE', null, token);
+    dispatch(actDeleteHomepage(id));
   }
 }
 
-export const actDeleteProducer = (id) => {
+export const actDeleteHomepage = (id) => {
   return {
-    type: Types.REMOVE_PRODUCER,
+    type: Types.REMOVE_HOMEPAGE,
     id
   }
 }
 
-export const actAddProducerRequest = (token, data) => {
+export const actAddHomepageRequest = (token, data) => {
   return async dispatch => {
-    const res = await callApi('producers', 'POST', data, token);
+    const res = await callApi('categories', 'POST', data, token);
     if (res && res.status === 200) {
-      toast.success('Add new Producer is success')
-      dispatch(actAddProducer(res.data));
+      toast.success('Add new Homepage is success')
+      dispatch(actAddHomepage(res.data));
     }
   }
 }
 
-export const actAddProducer = (data) => {
+export const actAddHomepage = (data) => {
   return {
-    type: Types.ADD_PRODUCER,
+    type: Types.ADD_HOMEPAGE,
     data
   }
 }
 
-export const actGetProducerRequest = (token, id) => {
+export const actGetHomepageRequest = (token, id) => {
   return async dispatch => {
-    await callApi(`producers/${id}`, 'GET', null, token);
+    await callApi(`categories/${id}`, 'GET', null, token);
   };
 }
 
-export const actEditProducerRequest = (token, id, data) => {
+export const actEditHomepageRequest = (token, id, data) => {
   return async dispatch => {
-    const res = await callApi(`producers/${id}`, 'PUT', data, token);
+    const res = await callApi(`categories/${id}`, 'PUT', data, token);
     if (res && res.status === 200) {
-      toast.success('Edit Producer is success')
-      dispatch(actEditProducer(res.data));
+      toast.success('Edit Homepage is success')
+      dispatch(actEditHomepage(res.data));
     }
   }
 }
 
-export const actEditProducer = (data) => {
+export const actEditHomepage = (data) => {
   return {
-    type: Types.EDIT_PRODUCER,
+    type: Types.EDIT_HOMEPAGE,
     data
   }
 }

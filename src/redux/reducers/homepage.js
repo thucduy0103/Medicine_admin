@@ -11,28 +11,28 @@ const findIndexs = (id, state) => {
     return result;
 }
 
-const producers = (state = initialState, action) => {
+const Homepages = (state = initialState, action) => {
     let index = -1;
     switch (action.type) {
-        case Types.FETCH_PRODUCERS:
-            state = action.producers;
+        case Types.FETCH_HOMEPAGES:
+            state = action.homepages;
             return [...state];
-        case Types.ADD_PRODUCER:
+        case Types.ADD_HOMEPAGE:
             state.push(action.data);
             return [...state];
-        case Types.REMOVE_PRODUCER:
+        case Types.REMOVE_HOMEPAGE:
             index = findIndexs(action.id, state);
             state.splice(index, 1);
             return [...state];
-        case Types.EDIT_PRODUCER:
+        case Types.EDIT_HOMEPAGE:
             index = findIndexs(action.data.id, state);
             state[index] = { ...action.data };
             return [...state];
-        case Types.FIND_PRODUCERS:
-            state = action.producers;
+        case Types.FIND_HOMEPAGES:
+            state = action.homepages;
             return [...state];
         default: return [...state];
     }
 };
 
-export default producers;
+export default Homepages;

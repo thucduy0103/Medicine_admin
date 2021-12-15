@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import MyFooter from '../../MyFooter/MyFooter'
-import { actAddProducerRequest, actGetProducerRequest, actEditProducerRequest } from '../../../redux/actions/producer';
+import { actAddHomepageRequest, actGetHomepageRequest, actEditHomepageRequest } from '../../../redux/actions/homepage';
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 import callApi from '../../../utils/apiCaller';
@@ -253,13 +253,13 @@ class ActionProducer extends Component {
 const mapDispatchToProps = (dispatch) => {
   return {
     add_Producer: (token, newProducer) => {
-      dispatch(actAddProducerRequest(token, newProducer))
+      dispatch(actAddHomepageRequest(token, newProducer))
     },
     get_Producer: (token, id) => {
-      dispatch(actGetProducerRequest(token, id))
+      dispatch(actGetHomepageRequest(token, id))
     },
     edit_Producer: (token, id, data) => {
-      dispatch(actEditProducerRequest(token, id, data))
+      dispatch(actEditHomepageRequest(token, id, data))
     }
   }
 }
