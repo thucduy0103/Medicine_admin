@@ -12,7 +12,7 @@ const MySwal = withReactContent(Swal)
 
 let token;
 
-class homepage extends Component {
+class Producer extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -28,9 +28,8 @@ class homepage extends Component {
   fetch_reload_data(){
     token = localStorage.getItem('_auth');
     this.props.fetch_homepages(token).then(res => {
-      console.log(res);
       this.setState({
-        total: res.total
+        total: res.totalResults
       });
     }).catch(err => {
       console.log(err);
@@ -94,7 +93,7 @@ class homepage extends Component {
 
   render() {
     let { homepages } = this.props;
-    console.log(this.props);
+    // console.log(this.props);
     const { searchText, total } = this.state;
     return (
       <div className="content-inner">
@@ -210,4 +209,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(homepage)
+export default connect(mapStateToProps, mapDispatchToProps)(Producer)

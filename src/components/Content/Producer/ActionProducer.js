@@ -7,8 +7,10 @@ import callApi from '../../../utils/apiCaller';
 import { uploadImage } from '../../../utils/upload'
 import { css } from '@emotion/core';
 import ClipLoader from 'react-spinners/ClipLoader';
+
 let token;
 let id;
+
 const override = css`
     display: block;
     margin: 0 auto;
@@ -22,7 +24,6 @@ class ActionProducer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isActive: true,
       name: '',
       desc: '',
       address: '',
@@ -45,7 +46,6 @@ class ActionProducer extends Component {
     if (id) {
       const res = await callApi(`producers/${id}`, 'GET', null, token);
       this.setState({
-        isActive: res.data.isActive,
         name: res.data.name,
         desc: res.data.description,
         address: res.data.address,
@@ -53,6 +53,10 @@ class ActionProducer extends Component {
         categoryId: res.data.categoryId
       })
     }
+  }
+
+  handleImport = () => {
+    console.log("abcd");
   }
 
   handleChangeImage = (event) => {
@@ -75,7 +79,8 @@ class ActionProducer extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { isActive, name, desc, address, categoryId } = this.state;
+    console.log("handleSubmit");
+    const { name, desc, address, categoryId } = this.state;
     let { img, image } = this.state;
     this.setState({
       loading: true
@@ -90,7 +95,6 @@ class ActionProducer extends Component {
     const newImage= (image === '') ? null : image
     if (!id) {
       const newProducer = {
-        isActive,
         name: newName,
         description: newDesc,
         address: newAddress,
@@ -105,7 +109,6 @@ class ActionProducer extends Component {
       })
     } else {
       const editProducer = {
-        isActive,
         name: newName,
         description: newDesc,
         address: newAddress,
@@ -121,7 +124,7 @@ class ActionProducer extends Component {
 
 
   render() {
-    const { isActive, name, desc, address, redirectToProducer, dataCategories, categoryId, loading, image } = this.state;
+    const { name, desc, address, redirectToProducer, categoryId, loading, image } = this.state;
     if (redirectToProducer) {
       return <Redirect to='/producers'></Redirect>
     }
@@ -162,46 +165,17 @@ class ActionProducer extends Component {
                   <div className="card-body">
                     <form className="form-horizontal" onSubmit={(event) => this.handleSubmit(event)} >
                       <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Name Producer</label>
+                        <label className="col-sm-3 form-control-label">Title</label>
                         <div className="col-sm-9">
-                          <input name="name" onChange={this.handleChange} value={name} type="text" className="form-control" />
+                          <input name="title" onChange={this.handleChange} value={name} type="text" className="form-control" />
                         </div>
                       </div>
                       <div className="line" />
                       <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Description</label>
+                        <label className="col-sm-3 form-control-label">List ids</label>
                         <div className="col-sm-9">
-                          <input name="desc" onChange={this.handleChange} value={desc} type="text" placeholder="Note" className="form-control" />
-                        </div>
-                      </div>
-                      <div className="line" />
-                      <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Address</label>
-                        <div className="col-sm-9">
-                          <input name="address" onChange={this.handleChange} value={address} type="text" placeholder="Note" className="form-control" />
-                        </div>
-                      </div>
-                      <div className="line" />
-                      <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Categories</label>
-                        <div className="col-sm-9">
-                          {/* <textarea name="properties" onChange={this.handleChange} value={properties} rows="5" className="form-control" /> */}
-                          {dataCategories && dataCategories.length ?
-                            dataCategories.map((item, index) => {
-                              return (
-                                <div key={index} className="i-checks" style={{ display: 'inline-block', paddingRight: 35 }} >
-                                  {
-                                    item.id === categoryId ?
-                                      <input id={index} name="categoryId" checked value={categoryId} onChange={this.handleChange} type="radio" value={item.id} className="radio-template" />
-                                      :
-                                      <input id={index} name="categoryId" value={categoryId} onChange={this.handleChange} type="radio" value={item.id} className="radio-template" />
-                                  }
-                                  <label>{item.nameCategory}</label>
-                                </div>
-                              )
-                            })
-                            : null
-                          }
+                          {/* <input name="list" onChange={this.handleChange} value={desc} type="text" placeholder="id_1, id_2,..." className="form-control" /> */} 
+                          <button type="reset" onClick={() => this.handleImport()} className="btn btn-primary">Import list product</button>
                         </div>
                       </div>
                       <div className="line" />
@@ -213,20 +187,6 @@ class ActionProducer extends Component {
                           <img src={image || 'http://via.placeholder.com/400x300'} id="output" className="fix-img" alt="avatar" />
                           </div>
                        </div>
-                      </div>
-                      <div className="line" />
-                      <div className="form-group row">
-                        <label className="col-sm-3 form-control-label">Active</label>
-                        <div className="col-sm-9">
-                          <div className="i-checks">
-                            <input type="checkbox"
-                              onChange={this.handleChange}
-                              name="isActive"
-                              checked={isActive}
-                              className="checkbox-template" />
-                            <label htmlFor="checkboxCustom1"></label>
-                          </div>
-                        </div>
                       </div>
                       <div className="line" />
                       <div className="form-group row">

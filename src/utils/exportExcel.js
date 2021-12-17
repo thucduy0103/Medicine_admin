@@ -1,14 +1,14 @@
 import * as Config from '../constants/Config';
-  
+
   export const exportExcel = (resource) => {
     console.log('resource', resource);
-    
+
     const request = new XMLHttpRequest();
     request.open(
       'GET',
       `${Config.API_URL}/${resource}/exportExcel?`
     );
-    request.setRequestHeader('Authorization', localStorage.getItem('_auth'));
+    request.setRequestHeader('Authorization',`Bearer ${localStorage.getItem('_auth')}`);
     request.responseType = 'arraybuffer';
     request.onload = () => {
       if (request.status === 200) {

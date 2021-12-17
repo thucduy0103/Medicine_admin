@@ -143,12 +143,12 @@ const routes = [
     main: ({ match, history }) => <ActionOrderPage match={match} history={history} />
   },
   {
-    path: '/producers/add',
+    path: '/homepages/add',
     exact: false,
     main: ({ history }) => <ActionProducerPage history={history} />
   },
   {
-    path: '/producers/edit/:id',
+    path: '/homepages/edit/:id',
     exact: false,
     main: ({ match, history }) => <ActionProducerPage match={match} history={history} />
   },

@@ -7,7 +7,7 @@ import products from './products';
 import categories from './categories';
 import orders from './orders';
 import dashboard from './dashboard';
-import homepage from './homepage';
+import homepages from './homepage';
 import nameRole from './nameRole';
 import infoMe from './infoMe';
 import ratings from './ratings';
@@ -23,7 +23,7 @@ const appReducers = combineReducers({
     categories,
     orders,
     dashboard,
-    homepage,
+    homepages,
     nameRole,
     infoMe,
     ratings,

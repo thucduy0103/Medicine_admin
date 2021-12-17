@@ -3,6 +3,7 @@ import './style.css'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { actFetchCategoriesRequest, actDeleteCategoryRequest, actFindCategoriesRequest } from '../../../redux/actions/category';
+import callApi from '../../../utils/apiCaller';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import MyFooter from '../../MyFooter/MyFooter'
@@ -18,7 +19,8 @@ class Category extends Component {
     this.state = {
       searchText: '',
       total: 0,
-      currentPage: 1
+      currentPage: 1,
+      listCategories : []
     }
   }
   componentDidMount() {
@@ -29,7 +31,8 @@ class Category extends Component {
     token = localStorage.getItem('_auth');
     this.props.fetch_categories(token).then(res => {
       this.setState({
-        total: res.total
+        total: res.total,
+        listCategories : this.props.categories
       });
     }).catch(err => {
       console.log(err);
@@ -76,6 +79,12 @@ class Category extends Component {
     });
   }
 
+  handleChangeCheckBox = async (id) => {
+    const res = await callApi(`categories/isShow/${id}`, 'PUT', null, token)
+    this.state.listCategories.find(item => item.id === id).isShowHome = res.data.isShowHome
+    this.setState({})
+  }
+
   handleSubmit = (event) => {
     event.preventDefault();
     const { searchText } = this.state;
@@ -92,8 +101,8 @@ class Category extends Component {
   }
 
   render() {
-    let { categories } = this.props;
-    const { searchText, total } = this.state;
+    // let { categories } = this.props;
+    const { listCategories, searchText, total } = this.state;
     return (
       <div className="content-inner">
         {/* Page Header*/}
@@ -140,11 +149,12 @@ class Category extends Component {
                             <th>Number</th>
                             <th>Name</th>
                             <th>Image</th>
+                            <th style={{ textAlign: "center" }}>Show home</th>
                             <th style={{ textAlign: "center" }}>Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {categories && categories.length ? categories.map((item, index) => {
+                          {listCategories && listCategories.length ? listCategories.map((item, index) => {
                             return (
                               <tr key={index}>
                                 <th scope="row">{index + 1}</th>
@@ -153,7 +163,16 @@ class Category extends Component {
                                     <div className="fix-cart2">
                                       <img src={item.image} className="fix-img2" alt="avatar" />
                                     </div>
-                                </td>                                
+                                </td>
+                                <td style={{ textAlign: "center" }}>{item.isShowHome ?
+                                  <div className="i-checks">
+                                    <input type="checkbox" checked={true} onChange={() => this.handleChangeCheckBox(item.id)} className="checkbox-template" />
+                                  </div>
+                                  :
+                                  <div className="i-checks">
+                                    <input type="checkbox" checked={false} onChange={() => this.handleChangeCheckBox(item.id)} className="checkbox-template" />
+                                  </div>}
+                                </td>
                                 <td style={{ textAlign: "center" }}>
                                   <div>
                                     <span title='Edit' className="fix-action"><Link to={`categories/edit/${item.id}`}> <i className="fa fa-edit"></i></Link></span>

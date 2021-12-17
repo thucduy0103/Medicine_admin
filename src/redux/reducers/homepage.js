@@ -11,7 +11,7 @@ const findIndexs = (id, state) => {
     return result;
 }
 
-const Homepages = (state = initialState, action) => {
+const homepages = (state = initialState, action) => {
     let index = -1;
     switch (action.type) {
         case Types.FETCH_HOMEPAGES:
@@ -35,4 +35,4 @@ const Homepages = (state = initialState, action) => {
     }
 };
 
-export default Homepages;
+export default homepages;

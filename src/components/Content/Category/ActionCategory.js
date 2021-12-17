@@ -155,7 +155,7 @@ class ActionCategory extends Component {
                           </div>
                        </div>
                       </div>
-                      <div className="line" />                      
+                      <div className="line" />
                       <div className="form-group row">
                         <div className="col-sm-4 offset-sm-3">
                           <Link to="/categories" className="btn btn-secondary" style={{ marginRight: 2 }}>Cancel</Link>
