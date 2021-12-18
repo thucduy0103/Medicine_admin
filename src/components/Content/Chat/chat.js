@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { actFetchContactsRequest, actDeleteContactRequest, actFindContactsRequest } from '../../../redux/actions/contact'
 import { exportExcel } from '../../../utils/exportExcel'
 import { Link } from "react-router-dom"
-import callApi from '../../../utils/apiCaller';
+import callApi from '../../../utils/apiCaller'
 import MyFooter from "../../MyFooter/MyFooter"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
@@ -13,9 +13,9 @@ import { io } from 'socket.io-client'
 const MySwal = withReactContent(Swal)
 
 const socket = io("http://teamedicine.tk:3000")
-let token;
-const limit = 10;
-const page = 1;
+let token
+const limit = 10
+const page = 1
 
 class Chat extends Component {
 
@@ -52,14 +52,8 @@ class Chat extends Component {
                     avatar: "https://i.imgur.com/53l2KD5.jpg"
                 }
             ],
-            currentUser: {
-                id: "61a075aa4c2e2dabf7c7c7e8",
-                name: "Nguyễn Đình Khoa",
-                avatar: "https://i.imgur.com/53l2KD5.jpg"
-            },
-            currentConversation: [
-
-            ],
+            currentUser: null,
+            currentConversation: [],
             message: ""
         }
     }
@@ -68,16 +62,15 @@ class Chat extends Component {
         socket.on("connect", () => {
             console.log(socket.id) // x8WIv7-mJelg7on_ALbx
             socket.emit('join_room', {
-                roomId: 'admin'
+                room: 'admin'
             })
         })
     }
 
     componentWillMount() {
-      this.fetch_reload_data()
+        this.fetch_reload_data()
         // ON RECEIVE MESSAGE - push message vao currentConversation
         socket.on('res_chat_text', (data) => {
-          console.log(data);
             this.setState({
                 currentConversation: [...this.state.currentConversation, {
                     id: 69,
@@ -97,24 +90,25 @@ class Chat extends Component {
 
     }
 
-    fetch_reload_data(){
-      token = localStorage.getItem('_auth');
-      this.props.fetch_contact(token, null).then(res => {
-        this.setState({
-          total: res.total
-        });
-      }).catch(err => {
-        console.log(err);
-      })
+    fetch_reload_data() {
+        token = localStorage.getItem('_auth')
+        this.props.fetch_contact(token, null).then(res => {
+            this.setState({
+                total: res.total
+            })
+        }).catch(err => {
+            console.log(err)
+        })
     }
 
-    onClickUserMenu = async(e, user) => {
+    onClickUserMenu = async (e, user) => {
         e.preventDefault()
         const res = await callApi(`chat/${user.roomId}?limit=${limit}&page=${page}&sortBy=-createdAt`, 'GET', null, token)
         this.setState({
             currentUser: user,
             currentConversation: res.data.results
         })
+        console.log("data: ", res.data.results)
         // CHANGE CURRENT USER & fetch conversations
         // this.setState({
         //     currentUser: user,
@@ -135,19 +129,20 @@ class Chat extends Component {
 
         this.setState({
             currentConversation: [...this.state.currentConversation, {
-                id: 69,
                 avatar: "https://i.imgur.com/53l2KD5.jpg",
-                text: this.state.message,
-                time: "12:00",
-                sender: "me"
+                message: this.state.message,
+                senderId: "admin"
             }]
         }, () => {
+
+            // Emit message to server socket
             socket.emit('chat_text', {
                 roomId: this.state.currentUser.roomId,
                 senderId: 'admin',
                 message: this.state.message
             })
 
+            // Reset input message
             this.setState({
                 message: ""
             })
@@ -176,6 +171,8 @@ class Chat extends Component {
     // RENDER
     render() {
         let { contacts } = this.props
+
+        console.log("contacts: ", contacts)
         // console.log(this.props);
         const { searchText, total } = this.state
         return (
@@ -205,7 +202,7 @@ class Chat extends Component {
                                     <input type="text" placeholder="Search" className="chat-admin__menu-search" value={searchText} onChange={(e) => this.setState({ searchText: e.target.value })} />
                                 </div>
 
-                                { contacts && contacts.length ? contacts.map((user, index) => {
+                                {contacts && contacts.length ? contacts.map((user, index) => {
                                     return (
                                         <div className="chat-admin__menu-item" key={index} onClick={(e) => this.onClickUserMenu(e, user)}>
                                             <div className="chat-admin__menu-item-avatar">
@@ -218,31 +215,33 @@ class Chat extends Component {
                                     )
                                 }) : null}
                             </div>
-                            <div className="chat-admin__main">
-                                <div className="chat-admin__main-header">
-                                    <img className='current-user__avatar' src={this.state.currentUser.roomAvatar} alt="" />
-                                    <div className="current-user__name">
-                                        {this.state.currentUser.roomName}
+                            {this.state.currentUser ?
+                                <div className="chat-admin__main">
+                                    <div className="chat-admin__main-header">
+                                        <img className='current-user__avatar' src={this.state.currentUser.roomAvatar} alt="" />
+                                        <div className="current-user__name">
+                                            {this.state.currentUser.roomName}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="chat-admin__main-content" id='main-chat-logs'>
-                                    {this.state.currentConversation.map((conversation, index) => {
-                                        return (
-                                            <div className={`chat-admin__main-content-item ${conversation.senderId}`} key={index}>
-                                                <div className="chat-admin__main-content-item-avatar"></div>
-                                                <div className="chat-admin__main-content-item-text">{conversation.message}</div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                                <div className="chat-admin__main-footer">
-                                    <input type="text" placeholder="Type your message"
-                                        value={this.state.message} onChange={(e) => this.onChangeText(e)}
-                                        onKeyDown={(e) => this.onKeyDownMessage(e)}
-                                        className="chat-admin__main-footer-input" />
-                                    <button className="chat-admin__main-footer-send" onClick={(e) => this.onClickSendMessage(e)}><i className="icon-paper-airplane" /></button>
-                                </div>
-                            </div>
+                                    <div className="chat-admin__main-content" id='main-chat-logs'>
+                                        {this.state.currentConversation.map((conversation, index) => {
+                                            return (
+                                                <div className={`chat-admin__main-content-item ${conversation.senderId}`} key={index}>
+                                                    <div className="chat-admin__main-content-item-text">{conversation.message}</div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    <div className="chat-admin__main-footer">
+                                        <input type="text" placeholder="Type your message"
+                                            value={this.state.message} onChange={(e) => this.onChangeText(e)}
+                                            onKeyDown={(e) => this.onKeyDownMessage(e)}
+                                            className="chat-admin__main-footer-input" />
+                                        <button className="chat-admin__main-footer-send" onClick={(e) => this.onClickSendMessage(e)}><i className="icon-paper-airplane" /></button>
+                                    </div>
+                                </div> : <div className="chat-admin__main-empty">
+                                    <h1>Chat with users</h1></div>}
+
                         </div>
                     </div>
                 </section>
