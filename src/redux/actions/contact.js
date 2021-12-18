@@ -8,14 +8,16 @@ export const actFetchContactsRequest = (token, offset) => {
   const newOffset = offset === null || offset === undefined ? 0 : offset;
   const limit = 10;
   return dispatch => {
-    dispatch(actShowLoading());
+    // dispatch(actShowLoading());
     return new Promise((resolve, reject) => {
       callApi(`chat?limit=${limit}&page=${newOffset}&sortBy=-createdAt`, 'GET', null, token)
         .then(res => {
           if(res && res.status === 200) {
             dispatch(actFetchContacts(res.data.results));
             resolve(res.data);
-            setTimeout(function(){ dispatch(actHiddenLoading()) }, 200);
+            // setTimeout(, 200);
+            // function(){  }
+            // dispatch(actHiddenLoading())
           }
         })
         .catch(err => {

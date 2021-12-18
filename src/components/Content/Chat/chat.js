@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { actFetchContactsRequest, actDeleteContactRequest, actFindContactsRequest } from '../../../redux/actions/contact'
-import { exportExcel } from '../../../utils/exportExcel'
 import { Link } from "react-router-dom"
 import callApi from '../../../utils/apiCaller'
 import MyFooter from "../../MyFooter/MyFooter"
@@ -12,7 +11,7 @@ import './style.css'
 import { io } from 'socket.io-client'
 const MySwal = withReactContent(Swal)
 
-const socket = io("http://teamedicine.tk:3000")
+const socket = io("http://localhost:3000")
 let token
 const limit = 10
 const page = 1
@@ -52,9 +51,10 @@ class Chat extends Component {
                     avatar: "https://i.imgur.com/53l2KD5.jpg"
                 }
             ],
-            currentUser: null,
+            currentUser : null,
             currentConversation: [],
-            message: ""
+            message: "",
+            unReadUser : ''
         }
     }
 
@@ -71,17 +71,21 @@ class Chat extends Component {
         this.fetch_reload_data()
         // ON RECEIVE MESSAGE - push message vao currentConversation
         socket.on('res_chat_text', (data) => {
+          if(data.roomId === this.state.currentUser.roomId){
             this.setState({
                 currentConversation: [...this.state.currentConversation, {
                     id: 69,
                     avatar: "https://i.imgur.com/53l2KD5.jpg",
-                    text: data.message,
+                    message: data.message,
                     time: "12:00",
                     senderId: data.senderId === 'admin' ? "me" : "other"
                 }]
             }, () => {
                 this.onScrollToEnd()
             })
+          }else {
+            this.fetch_reload_data()
+          }
         })
     }
 
@@ -94,11 +98,23 @@ class Chat extends Component {
         token = localStorage.getItem('_auth')
         this.props.fetch_contact(token, null).then(res => {
             this.setState({
-                total: res.total
+                total: res.total,
             })
+            if (this.state.currentUser === null) {
+              let user = res.results[0]
+              callApi(`chat/${this.props.contacts[0].roomId}?limit=${limit}&page=${page}&sortBy=-createdAt`, 'GET', null, token).then(res =>{
+                this.setState({
+                    currentUser: user,
+                    currentConversation: res.data.results
+                })
+              }).catch(err => {
+                  console.log(err)
+              })
+            }
         }).catch(err => {
             console.log(err)
         })
+
     }
 
     onClickUserMenu = async (e, user) => {
@@ -108,7 +124,8 @@ class Chat extends Component {
             currentUser: user,
             currentConversation: res.data.results
         })
-        console.log("data: ", res.data.results)
+        this.fetch_reload_data()
+        // console.log("data: ", res.data.results)
         // CHANGE CURRENT USER & fetch conversations
         // this.setState({
         //     currentUser: user,
@@ -134,7 +151,6 @@ class Chat extends Component {
                 senderId: "admin"
             }]
         }, () => {
-
             // Emit message to server socket
             socket.emit('chat_text', {
                 roomId: this.state.currentUser.roomId,
@@ -171,8 +187,7 @@ class Chat extends Component {
     // RENDER
     render() {
         let { contacts } = this.props
-
-        console.log("contacts: ", contacts)
+        // console.log("contacts: ", contacts)
         // console.log(this.props);
         const { searchText, total } = this.state
         return (
@@ -210,6 +225,9 @@ class Chat extends Component {
                                             </div>
                                             <div className="chat-admin__menu-item-name">
                                                 {user.roomName}
+                                            </div>
+                                            <div className="chat-admin__menu-item-name">
+                                                {user.adminRead === false ? '----' : null}
                                             </div>
                                         </div>
                                     )
