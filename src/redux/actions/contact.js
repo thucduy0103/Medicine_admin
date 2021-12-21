@@ -5,8 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { actShowLoading, actHiddenLoading } from './loading'
 
 export const actFetchContactsRequest = (token, offset) => {
-  const newOffset = offset === null || offset === undefined ? 0 : offset;
-  const limit = 10;
+  const newOffset = offset === null || offset === undefined ? 1 : offset;
+  const limit = 20;
   return dispatch => {
     // dispatch(actShowLoading());
     return new Promise((resolve, reject) => {

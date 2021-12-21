@@ -3,6 +3,7 @@ import './style.css'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { actFetchProductsRequest, actDeleteProductRequest, actFindProductsRequest } from '../../../redux/actions/product';
+import Parser from 'html-react-parser';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import MyFooter from '../../MyFooter/MyFooter'
@@ -27,7 +28,11 @@ class Product extends Component {
 
 
   componentDidMount() {
-    this.fetch_reload_data();
+    let { products } = this.props;
+    // console.log(products);
+    if (products.length ==  0) {
+      this.fetch_reload_data();
+    }
   }
 
   fetch_reload_data(){
@@ -98,8 +103,15 @@ class Product extends Component {
     exportExcel(key)
   }
 
+  unescapeHTML(escapedHTML){
+    // return escapedHTML.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+    let str = escapedHTML.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&')
+    return Parser(str)
+  }
+
   render() {
     let { products } = this.props;
+    // console.log(this.props);
     const { searchText, total } = this.state;
     return (
       <div className="content-inner">
@@ -160,7 +172,7 @@ class Product extends Component {
                               <tr key={index}>
                                 <th scope="row">{index + 1}</th>
                                 <td style={{ width: 300 }}>{item.name}</td>
-                                <td><p className="text-truncate" style={{ width: 300 }}>{item.description}</p></td>
+                                <td><p className="text-truncate-desc" style={{ width: 300 }}>{(this.unescapeHTML(item.description))}</p></td>
                                 <td>{item.price}</td>
                                 <td style={{ textAlign: "center" }}>{item.inventoryQty}</td>
                                 {/* <td>{item.properties}</td> */}

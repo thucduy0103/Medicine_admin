@@ -33,7 +33,7 @@ class NavBar extends Component {
         {(nameRole === 'superadmin' || nameRole === 'admin') ?
           <ul className="list-unstyled">
             <li><Link to="/"> <i className="icon-home" />Home </Link></li>
-            <li><Link to="/home-page"> <i className="icon icon-list-1" />Main-home</Link></li>
+            {/* <li><Link to="/home-page"> <i className="icon icon-list-1" />Main-home</Link></li> */}
             <li><Link to="/orders"> <i className="icon icon-bill" />Orders</Link></li>
             <li><Link to="/categories"> <i className="icon-interface-windows" />Categories</Link></li>
             <li><Link to="/products"> <i className="icon icon-website" />Products</Link></li>
@@ -50,11 +50,11 @@ class NavBar extends Component {
             <li><Link to="/orders"> <i className="icon icon-bill" />Orders</Link></li>
           </ul>
         }
-        <span className="heading">Extras</span>
+        {/* <span className="heading">Extras</span>
         <ul className="list-unstyled">
           <li> <Link to="/"> <i className="icon-screen" />Abount </Link></li>
           <li> <Link to="/"> <i className="icon-flask" />Help </Link></li>
-        </ul>
+        </ul> */}
       </nav>
     )
   }

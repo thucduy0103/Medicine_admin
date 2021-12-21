@@ -97,6 +97,7 @@ export const actAddProductRequest = (token, data) => {
     const res = await callApi('products', 'POST', data, token);
     if (res && res.status === 200) {
       toast.success('Add new Product is success')
+      // console.log(res.data);
       dispatch(actAddProduct(res.data));
     }
   }

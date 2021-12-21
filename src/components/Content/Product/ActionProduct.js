@@ -13,6 +13,8 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import moment from 'moment'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css';
+import Parser from 'html-react-parser';
+
 let token;
 let id;
 const override = css`
@@ -82,14 +84,13 @@ class ActionProduct extends Component {
         // const resProducer =  await callApi(`category/${res.data.chooseCategories}/producers`, 'GET', null);
         const convertProperties = JSON.stringify(res.data.properties)
         this.setState({
-          // dataProducer: resProducer,
           nameProduct: res.data.name,
           price: res.data.price,
           discountPrice: res.data.discountPrice,
           unit: res.data.unit,
           numberAvailable: res.data.inventoryQty,
           category: res.data.category,
-          desc: res.data.description,
+          desc: Parser(res.data.description),
           image: res.data.image,
           properties: convertProperties,
           productionDate: res.data.productionDate,
@@ -174,7 +175,7 @@ class ActionProduct extends Component {
         newFiles.push(builder);
       }
     }
-    const newDesc = desc === '' ? null : desc;
+    const newDesc = desc === '' ? '' : desc;
     const newName = nameProduct === '' ? null : nameProduct;
     const newImage = image === '' ? null : image;
     const newGallery = newFiles && newFiles.length === 0 ? null : newFiles;
@@ -233,6 +234,7 @@ class ActionProduct extends Component {
         expiryDate : newExpiryDate
       }
       await this.props.edit_Product(token, id, editProduct);
+      console.log(editProduct);
       this.setState({
         loading: false,
         redirectToProduct: true,
@@ -258,6 +260,8 @@ class ActionProduct extends Component {
   ];
 
   render() {
+    // console.log(this.state.dataCategories);
+    // console.log(this.state.category);
     const { dataGallery, nameProduct, loading, price, discountPrice, numberAvailable, unit, category, image, desc, redirectToProduct, dataCategories, productionDate, expiryDate } = this.state;
     let files;
     if(dataGallery && dataGallery.length !== 0) {
@@ -388,10 +392,10 @@ class ActionProduct extends Component {
                               return (
                                 <div key={index} className="i-checks" style={{ display: 'inline-block', paddingRight: 35 }} >
                                   {
-                                     category.includes(item.slug) ?
-                                      <input id={index} name="category" checked onChange={this.handleChangeCategory} type="checkbox" value={item.slug} className="checkbox-template" />
+                                     category.includes(item.id) ?
+                                      <input id={index} name="category" checked onChange={this.handleChangeCategory} type="checkbox" value={item.id} className="checkbox-template" />
                                       :
-                                      <input id={index} name="category" onChange={this.handleChangeCategory} type="checkbox" value={item.slug} className="checkbox-template" />
+                                      <input id={index} name="category" onChange={this.handleChangeCategory} type="checkbox" value={item.id} className="checkbox-template" />
                                   }
                                   <label>{item.name}</label>
                                 </div>

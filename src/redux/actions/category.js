@@ -97,6 +97,7 @@ export const actAddCategoryRequest = (token, data) => {
     const res = await callApi('categories/create', 'POST', data, token);
     if (res && res.status === 200) {
       toast.success('Add new category is success')
+      console.log(res.data);
       dispatch(actAddCategory(res.data));
     }
   }

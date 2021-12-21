@@ -13,13 +13,16 @@ const findIndexs = (id, state) => {
 
 const products = (state = initialState, action) => {
     let index = -1;
+    // console.log(state);
+    // console.log(action);
     switch (action.type) {
         case Types.FETCH_PRODUCTS:
             state = action.products;
             return [...state];
         case Types.ADD_PRODUCT:
-            state.push(action.data);
-            return [...state];
+            // state.push(action.data);
+            let arr = [action.data]
+            return arr.concat([...state]);
         case Types.REMOVE_PRODUCT:
             index = findIndexs(action.id, state);
             state.splice(index, 1);

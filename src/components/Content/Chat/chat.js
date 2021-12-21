@@ -13,7 +13,7 @@ const MySwal = withReactContent(Swal)
 
 const socket = io("http://localhost:3000")
 let token
-const limit = 10
+const limit = 20
 const page = 1
 
 class Chat extends Component {
@@ -24,37 +24,12 @@ class Chat extends Component {
             searchText: "",
             total: 0,
             currentPage: 1,
-            users: [
-                {
-                    id: "61a075aa4c2e2dabf7c7c7e8",
-                    name: "Nguyễn Đình Khoa",
-                    avatar: "https://i.imgur.com/53l2KD5.jpg"
-                },
-                {
-                    id: "61b701afce6d1c869431ac74",
-                    name: "Khoa Nguyễn Đình",
-                    avatar: "https://i.imgur.com/53l2KD5.jpg"
-                },
-                {
-                    id: "61a075aa4c2e2dabf7c7c7e8",
-                    name: "Hồ Duy Thức",
-                    avatar: "https://i.imgur.com/53l2KD5.jpg"
-                },
-                {
-                    id: "61a075aa4c2e2dabf7c7c7e8",
-                    name: "Obama",
-                    avatar: "https://i.imgur.com/53l2KD5.jpg"
-                },
-                {
-                    id: "61b701afce6d1c869431ac74",
-                    name: "Justin Bieber",
-                    avatar: "https://i.imgur.com/53l2KD5.jpg"
-                }
-            ],
+            listUsers: [],
             currentUser : null,
             currentConversation: [],
             message: "",
-            unReadUser : ''
+            unReadUser : '',
+            showNew : false
         }
     }
 
@@ -65,6 +40,32 @@ class Chat extends Component {
                 room: 'admin'
             })
         })
+    }
+
+    fetch_reload_data() {
+        token = localStorage.getItem('_auth')
+        this.props.fetch_contact(token, null).then(res => {
+            this.setState({
+                total: res.total,
+                listUsers: res.results
+            })
+            if (this.state.currentUser === null) {
+              let user = res.results[0]
+              callApi(`chat/${this.props.contacts[0].roomId}?limit=${limit}&page=${page}&sortBy=-createdAt`, 'GET', null, token).then(res =>{
+                this.setState({
+                    currentUser: user,
+                    currentConversation: res.data.results
+                }, () => {
+                    this.onScrollToEnd()
+                })
+              }).catch(err => {
+                  console.log(err)
+              })
+            }
+        }).catch(err => {
+            console.log(err)
+        })
+
     }
 
     componentWillMount() {
@@ -84,36 +85,18 @@ class Chat extends Component {
                 this.onScrollToEnd()
             })
           }else {
+            // console.log("false");
+            // console.log(data);
             this.fetch_reload_data()
+            this.setState({
+              showNew: true
+            })
           }
         })
     }
 
     //FETCH
     onFetchContacts() {
-
-    }
-
-    fetch_reload_data() {
-        token = localStorage.getItem('_auth')
-        this.props.fetch_contact(token, null).then(res => {
-            this.setState({
-                total: res.total,
-            })
-            if (this.state.currentUser === null) {
-              let user = res.results[0]
-              callApi(`chat/${this.props.contacts[0].roomId}?limit=${limit}&page=${page}&sortBy=-createdAt`, 'GET', null, token).then(res =>{
-                this.setState({
-                    currentUser: user,
-                    currentConversation: res.data.results
-                })
-              }).catch(err => {
-                  console.log(err)
-              })
-            }
-        }).catch(err => {
-            console.log(err)
-        })
 
     }
 
@@ -186,10 +169,10 @@ class Chat extends Component {
 
     // RENDER
     render() {
-        let { contacts } = this.props
+        // let { contacts } = this.props
         // console.log("contacts: ", contacts)
         // console.log(this.props);
-        const { searchText, total } = this.state
+        const { listUsers, searchText, total } = this.state
         return (
             <div className="content-inner">
                 {/* Page Header*/}
@@ -216,8 +199,7 @@ class Chat extends Component {
                                 <div className="chat-admin__menu-header">
                                     <input type="text" placeholder="Search" className="chat-admin__menu-search" value={searchText} onChange={(e) => this.setState({ searchText: e.target.value })} />
                                 </div>
-
-                                {contacts && contacts.length ? contacts.map((user, index) => {
+                                {listUsers && listUsers.length ? listUsers.map((user, index) => {
                                     return (
                                         <div className="chat-admin__menu-item" key={index} onClick={(e) => this.onClickUserMenu(e, user)}>
                                             <div className="chat-admin__menu-item-avatar">
@@ -226,8 +208,8 @@ class Chat extends Component {
                                             <div className="chat-admin__menu-item-name">
                                                 {user.roomName}
                                             </div>
-                                            <div className="chat-admin__menu-item-name">
-                                                {user.adminRead === false ? '----' : null}
+                                            <div className="breadcrumb-item active" style={{display: this.state.showNew? 'block' : 'none' }}>
+                                                {user.adminRead === false ? '(new message)' : null}
                                             </div>
                                         </div>
                                     )
